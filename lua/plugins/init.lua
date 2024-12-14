@@ -193,11 +193,11 @@ return {
       'williamboman/mason.nvim',
       'williamboman/mason-lspconfig.nvim',
       'WhoIsSethDaniel/mason-tool-installer.nvim',
-      'hrsh7th/nvim-cmp',
+      'Saghen/blink.cmp',
     },
     config = function ()
       local capabilities = vim.lsp.protocol.make_client_capabilities()
-      capabilities = vim.tbl_deep_extend('force', capabilities, require('cmp_nvim_lsp').default_capabilities())
+      capabilities = require('blink.cmp').get_lsp_capabilities(capabilities)
 
       local servers = {
         ts_ls = {},
@@ -221,61 +221,39 @@ return {
       vim.keymap.set('v', '<leader>ca', '<cmd>lua vim.lsp.buf.code_action()<cr>', { silent = true })
     end,
   },
-  -- { 'hrsh7th/cmp-nvim-lsp', cond = is_vanilla },
   {
-    'hrsh7th/nvim-cmp',
+    'saghen/blink.cmp',
+    version = 'v0.*',
     cond = is_vanilla,
-    dependencies = {
-      {
-        'L3MON4D3/LuaSnip',
-        build = (function()
-          if vim.fn.has 'win32' == 1 or vim.fn.executable 'make' == 0 then
-            return
-          end
-          return 'make install_jsregexp'
-        end)(),
+    lazy = false,
+    dependencies = { 'L3MON4D3/LuaSnip', version = 'v2.*' },
+    opts = {
+      keymap = {
+        preset = 'super-tab',
+        ['<c-k>'] = { 'select_prev', 'fallback' },
+        ['<c-j>'] = { 'select_next', 'fallback' },
       },
-      'saadparwaiz1/cmp_luasnip',
-      'hrsh7th/cmp-nvim-lsp',
-      'hrsh7th/cmp-path',
-    },
-    config = function ()
-      local cmp = require('cmp')
-      local luasnip = require('luasnip')
-      luasnip.config.setup({})
-
-      cmp.setup({
-        snippet = {
-          expand = function(args)
-            luasnip.lsp_expand(args.body)
-          end,
+      snippets = {
+        expand = function(snippet) require('luasnip').lsp_expand(snippet) end,
+        active = function(filter)
+          if filter and filter.direction then
+            return require('luasnip').jumpable(filter.direction)
+          end
+          return require('luasnip').in_snippet()
+        end,
+        jump = function(direction) require('luasnip').jump(direction) end,
+      },
+      sources = {
+        -- default = { 'lsp', 'path', 'luasnip', 'buffer' },
+        completion = {
+          enabled_providers = { 'lsp', 'path', 'luasnip', 'buffer', 'lazydev' },
         },
-        mapping = cmp.mapping.preset.insert({
-          ['<tab>'] = cmp.mapping.confirm({ select = true }),
-          ['<c-j>'] = cmp.mapping.select_next_item(),
-          ['<c-k>'] = cmp.mapping.select_prev_item(),
-          ['<c-l>'] = cmp.mapping(function ()
-            if luasnip.expand_or_locally_jumpable() then
-              luasnip.expand_or_jump()
-            end
-          end, { 'i', 's' }),
-          ['<c-h>'] = cmp.mapping(function ()
-            if luasnip.locally_jumpable(-1) then
-              luasnip.jump(-1)
-            end
-          end, { 'i', 's' }),
-        }),
-        sources = cmp.config.sources({
-          {
-            name = 'lazydev',
-            group_index = 0,
-          },
-          { name = 'nvim_lsp' },
-          { name = 'luasnip' },
-          { name = 'path' },
-        }),
-      })
-    end,
+        providers = {
+          lsp = { fallback_for = { 'lazydev' } },
+          lazydev = { name = 'LazyDev', module = 'lazydev.integrations.blink' },
+        },
+      },
+    },
   },
 
   -- Formatting.
