@@ -78,11 +78,11 @@ vim.o.number = true
 vim.opt.number = true
 vim.opt.wrap = false
 vim.api.nvim_create_autocmd("FileType", {
-    pattern = "markdown",
-    callback = function()
-        vim.opt_local.wrap = true   -- Enable line wrapping
-        vim.opt_local.linebreak = true -- Break lines at word boundaries
-    end,
+  pattern = "markdown",
+  callback = function()
+    vim.opt_local.wrap = true
+    vim.opt_local.linebreak = true
+  end,
 })
 
 vim.keymap.set({ 'n', 'v' }, 'j', 'gj', { noremap = true, silent = true })
@@ -193,30 +193,6 @@ end
 
 -- Intellisense.
 
-if is_vanilla then
-  local cmp = require('cmp')
-  cmp.setup({
-    mapping = cmp.mapping.preset.insert({
-      ['<CR>'] = cmp.mapping.confirm({ select = true }),
-    }),
-    sources = cmp.config.sources({
-      { name = 'nvim_lsp' },
-    }),
-  })
-
-  local capabilities = require('cmp_nvim_lsp').default_capabilities()
-
-  require('mason').setup()
-  require('mason-lspconfig').setup({
-    ensure_installed = { 'ts_ls' }
-  })
-  require('lspconfig')['ts_ls'].setup({ capabilities = capabilities })
-  -- require('lspconfig')['marksman'].setup({ capabilities = capabilities })
-
-  -- nnoremap <silent> <c-.> <cmd>lua vim.lsp.buf.code_action()<CR>
-  map('n', '<leader>ca', '<cmd>lua vim.lsp.buf.code_action()<cr>', { silent = true })
-  map('v', '<leader>ca', '<cmd>lua vim.lsp.buf.code_action()<cr>', { silent = true })
-end
 
 vim.keymap.set('n', 'gd', vim.lsp.buf.definition, { noremap = true, silent = true, desc = 'Go to definition' })
 -- vim.keymap.set('n', '<leader>ch', '<cmd>Lspsaga hover_doc<cr>', { noremap = true, silent = true })
@@ -242,4 +218,9 @@ if is_vanilla then
   vim.keymap.set({ 'n', 'v' }, '<m-]>', 'zo', { noremap = true, silent = true, desc = 'Open fold under cursor' })
   vim.keymap.set('i', '<m-]>', '<c-o>zo', { noremap = true, silent = true, desc = 'Open fold under cursor' })
 end
+
+
+-- Terminal.
+
+vim.keymap.set('t', '<esc><esc>', '<c-\\><c-n>', { noremap = true, silent = true, desc = 'Exit terminal mode' })
 

@@ -64,16 +64,6 @@ return {
     'junegunn/fzf',
     cond = is_vanilla,
   },
-  -- {
-  --   'junegunn/fzf.vim',
-  --   cond = is_vanilla,
-  --   keys = {
-  --     { '<leader><leader>', '<cmd>Commands<cr>', desc = 'Command palette' },
-  --     { '<leader>ff', '<cmd>Files<cr>', desc = 'Find file' },
-  --     { '<leader>bf', '<cmd>Buffers<cr>', desc = 'Find buffer' },
-  --     { '<leader>fs', '<cmd>Rg<cr>', desc = 'Find in files' }
-  --   },
-  -- },
   {
     "ibhagwan/fzf-lua",
     cond = is_vanilla,
@@ -127,8 +117,13 @@ return {
 
       local configs = require('nvim-treesitter.configs')
       configs.setup({
-        ensure_installed = { 'markdown', 'javascript', 'typescript', 'lua', 'python' },
-
+        ensure_installed = {
+          'markdown',
+          'javascript',
+          'typescript',
+          'lua',
+          'python'
+        },
         textobjects = {
           select = {
             enable = true,
@@ -183,11 +178,105 @@ return {
       vim.api.nvim_set_keymap('n', '}', ':lua require"nvim-treesitter.incremental_selection".init_selection()<CR>', { noremap = true, silent = true })
     end,
   },
-  { 'williamboman/mason.nvim', cond = is_vanilla },
-  { 'williamboman/mason-lspconfig.nvim', cond = is_vanilla },
-  { 'neovim/nvim-lspconfig', cond = is_vanilla },
-  { 'hrsh7th/cmp-nvim-lsp', cond = is_vanilla },
-  { 'hrsh7th/nvim-cmp', cond = is_vanilla },
+  {
+    'folke/lazydev.nvim',
+    ft = 'lua',
+    cond = is_vanilla,
+    opts = {
+      library = { "~/.config/nvim" },
+    },
+  },
+  {
+    'neovim/nvim-lspconfig',
+    cond = is_vanilla,
+    dependencies = {
+      'williamboman/mason.nvim',
+      'williamboman/mason-lspconfig.nvim',
+      'WhoIsSethDaniel/mason-tool-installer.nvim',
+      'hrsh7th/nvim-cmp',
+    },
+    config = function ()
+      local capabilities = vim.lsp.protocol.make_client_capabilities()
+      capabilities = vim.tbl_deep_extend('force', capabilities, require('cmp_nvim_lsp').default_capabilities())
+
+      local servers = {
+        ts_ls = {},
+        lua_ls = {},
+      }
+      local ensure_installed = vim.tbl_keys(servers or {})
+
+      require('mason').setup()
+      require('mason-tool-installer').setup { ensure_installed = ensure_installed }
+      require('mason-lspconfig').setup {
+        handlers = {
+          function(server_name)
+            local server = servers[server_name] or {}
+            server.capabilities = vim.tbl_deep_extend('force', {}, capabilities, server.capabilities or {})
+            require('lspconfig')[server_name].setup(server)
+          end,
+        },
+      }
+
+      vim.keymap.set('n', '<leader>ca', '<cmd>lua vim.lsp.buf.code_action()<cr>', { silent = true })
+      vim.keymap.set('v', '<leader>ca', '<cmd>lua vim.lsp.buf.code_action()<cr>', { silent = true })
+    end,
+  },
+  -- { 'hrsh7th/cmp-nvim-lsp', cond = is_vanilla },
+  {
+    'hrsh7th/nvim-cmp',
+    cond = is_vanilla,
+    dependencies = {
+      {
+        'L3MON4D3/LuaSnip',
+        build = (function()
+          if vim.fn.has 'win32' == 1 or vim.fn.executable 'make' == 0 then
+            return
+          end
+          return 'make install_jsregexp'
+        end)(),
+      },
+      'saadparwaiz1/cmp_luasnip',
+      'hrsh7th/cmp-nvim-lsp',
+      'hrsh7th/cmp-path',
+    },
+    config = function ()
+      local cmp = require('cmp')
+      local luasnip = require('luasnip')
+      luasnip.config.setup({})
+
+      cmp.setup({
+        snippet = {
+          expand = function(args)
+            luasnip.lsp_expand(args.body)
+          end,
+        },
+        mapping = cmp.mapping.preset.insert({
+          ['<tab>'] = cmp.mapping.confirm({ select = true }),
+          ['<c-j>'] = cmp.mapping.select_next_item(),
+          ['<c-k>'] = cmp.mapping.select_prev_item(),
+          ['<c-l>'] = cmp.mapping(function ()
+            if luasnip.expand_or_locally_jumpable() then
+              luasnip.expand_or_jump()
+            end
+          end, { 'i', 's' }),
+          ['<c-h>'] = cmp.mapping(function ()
+            if luasnip.locally_jumpable(-1) then
+              luasnip.jump(-1)
+            end
+          end, { 'i', 's' }),
+        }),
+        sources = cmp.config.sources({
+          {
+            name = 'lazydev',
+            group_index = 0,
+          },
+          { name = 'nvim_lsp' },
+          { name = 'luasnip' },
+          { name = 'path' },
+        }),
+      })
+    end,
+  },
 
   -- Formatting.
   {
@@ -235,8 +324,7 @@ return {
 
       if is_vanilla then
         require('mini.pairs').setup({})
-        require('mini.files').setup({
-        })
+        require('mini.files').setup({})
         vim.keymap.set('n', '<leader>fe', '<cmd>:lua MiniFiles.open()<cr>', { noremap = true, silent = true, desc = 'File explorer' })
       end
     end
