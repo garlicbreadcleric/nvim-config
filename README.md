@@ -11,6 +11,14 @@
 - `<c-k>`, `<c-j>` - move 8 visual lines up/down
 - `H`, `L` - start/end of line
 - `K`, `J` - start/end of file
+- `w` - jump to start/end of \[w]\ord
+- `W` - jump to start/end of \[W]\ORD
+
+## go to
+
+- `gd` - \[g\]o to \[d\]efinition
+- `gr` - \[g\]o to \[r\]eferences
+- `gi` - \[g\]o to \[i\]implementations
 
 ## space-object-action
 
@@ -18,12 +26,14 @@
 - `<space>ff` - \[f\]ile \[f\]ind
 - `<space>fs` - \[f\]ile \[s\]earch
 - `<space>fo` - \[f\]ile \[o\]pen
-- `<space>fO` - \[f\]older \[O\]pen
-- `<space>fr` - \[f\]older \[r\]ecent
+- `<space>fr` - \[file\] or \[F\]older \[r\]ecent
+- `<space>Fo` - \[F\]older \[o\]pen
 - `<space>bn` - \[b\]uffer \[n\]ew
 - `<space>bf` - \[b\]uffer \[f\]ind
 - `<space>bd` - \[b\]uffer \[d\]elete
 - `<space>bD` - \[b\]uffer \[D\]elete (forced)
+- `<space>ca` - \[c\]ode \[a\]ction
+- `<space>ch` - \[c\]ode \[h\]int
 
 ## prev/next
 

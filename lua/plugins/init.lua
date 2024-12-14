@@ -46,32 +46,54 @@ return {
   },
 
   -- File navigation.
-  {
-    "nvim-tree/nvim-tree.lua",
-    version = "*",
-    lazy = false,
-    cond = is_vanilla,
-    dependencies = {
-      "nvim-tree/nvim-web-devicons",
-    },
-    config = function()
-      require("nvim-tree").setup {}
-    end,
-  },
+  -- {
+  --   "nvim-tree/nvim-tree.lua",
+  --   version = "*",
+  --   lazy = false,
+  --   cond = is_vanilla,
+  --   dependencies = {
+  --     "nvim-tree/nvim-web-devicons",
+  --   },
+  --   config = function()
+  --     require("nvim-tree").setup {}
+  --   end,
+  -- },
   
   -- Text navigation.
   {
     'junegunn/fzf',
     cond = is_vanilla,
   },
+  -- {
+  --   'junegunn/fzf.vim',
+  --   cond = is_vanilla,
+  --   keys = {
+  --     { '<leader><leader>', '<cmd>Commands<cr>', desc = 'Command palette' },
+  --     { '<leader>ff', '<cmd>Files<cr>', desc = 'Find file' },
+  --     { '<leader>bf', '<cmd>Buffers<cr>', desc = 'Find buffer' },
+  --     { '<leader>fs', '<cmd>Rg<cr>', desc = 'Find in files' }
+  --   },
+  -- },
   {
-    'junegunn/fzf.vim',
+    "ibhagwan/fzf-lua",
     cond = is_vanilla,
+    dependencies = { "nvim-tree/nvim-web-devicons" },
+    config = function()
+      require("fzf-lua").setup({ fzf_colors = true })
+    end,
     keys = {
-      { '<leader><leader>', '<cmd>Commands<cr>', desc = 'Command palette' },
-      { '<leader>ff', '<cmd>Files<cr>', desc = 'Find file' },
-      { '<leader>bf', '<cmd>Buffers<cr>', desc = 'Find buffer' },
-      { '<leader>fs', '<cmd>Rg<cr>', desc = 'Find in files' }
+      { '<leader><leader>', '<cmd>FzfLua commands resume=true<cr>', desc = 'Command palette' },
+      { '<leader>ff', '<cmd>FzfLua files resume=true<cr>', desc = 'Find file' },
+      { '<leader>fs', '<cmd>FzfLua live_grep resume=true<cr>', desc = 'Search in files' },
+      { '<leader>bf', '<cmd>FzfLua buffers resume=true<cr>', desc = 'Find buffer' },
+      { '<leader>ca', '<cmd>FzfLua lsp_code_actions resume=true<cr>', desc = 'Code actions' },
+      { '<leader>cd', '<cmd>FzfLua lsp_definitions resume=true<cr>', desc = 'Code definitions' },
+      { '<leader>cs', '<cmd>FzfLua lsp_document_symbols resume=true<cr>', desc = 'Code symbols (document)' },
+      { '<leader>cS', '<cmd>FzfLua lsp_live_workspace_symbols resume=true<cr>', desc = 'Code symbols (workspace)' },
+      { '<leader>cr', '<cmd>FzfLua lsp_references resume=true<cr>', desc = 'Code references' },
+      { '<leader>ci', '<cmd>FzfLua lsp_implementations resume=true<cr>', desc = 'Code implementations' },
+      { '<leader>cw', '<cmd>FzfLua lsp_document_diagnostics resume=true<cr>', desc = 'Code warnings (document)' },
+      { '<leader>cW', '<cmd>FzfLua lsp_workspace_diagnostics resume=true<cr>', desc = 'Code warnings (workspace)' },
     },
   },
   {
@@ -161,59 +183,32 @@ return {
       vim.api.nvim_set_keymap('n', '}', ':lua require"nvim-treesitter.incremental_selection".init_selection()<CR>', { noremap = true, silent = true })
     end,
   },
-  -- {
-  --   "sustech-data/wildfire.nvim",
-  --   event = "VeryLazy",
-  --   dependencies = { "nvim-treesitter/nvim-treesitter" },
-  --   config = function()
-  --     require("wildfire").setup()
-  --   end,
-  -- },
   { 'williamboman/mason.nvim', cond = is_vanilla },
   { 'williamboman/mason-lspconfig.nvim', cond = is_vanilla },
   { 'neovim/nvim-lspconfig', cond = is_vanilla },
   { 'hrsh7th/cmp-nvim-lsp', cond = is_vanilla },
   { 'hrsh7th/nvim-cmp', cond = is_vanilla },
-  -- {
-  --   'nvimdev/lspsaga.nvim',
-  --   cond = is_vanilla,
-  --   config = function()
-  --     require('lspsaga').setup({})
-  --   end,
-  --   dependencies = {
-  --     'nvim-treesitter/nvim-treesitter', -- optional
-  --     'nvim-tree/nvim-web-devicons',     -- optional
-  --   }
-  -- },
 
   -- Formatting.
   {
     'editorconfig/editorconfig-vim'
   },
 
-  -- Notes.
-  -- {
-  --   "epwalsh/obsidian.nvim",
-  --   version = "*",  -- recommended, use latest release instead of latest commit
-  --   lazy = true,
-  --   ft = "markdown",
-  --   dependencies = {
-  --     -- Required.
-  --     "nvim-lua/plenary.nvim",
-  --
-  --     -- see below for full list of optional dependencies 👇
-  --   },
-  --   opts = {
-  --     workspaces = {
-  --       {
-  --         name = "notes",
-  --         path = "~/Dropbox/Documents/Notes2",
-  --       },
-  --     },
-  --
-  --     -- see below for full list of options 👇
-  --   },
-  -- },
+  -- Notes
+  {
+    "zk-org/zk-nvim",
+    config = function()
+      require("zk").setup({
+        picker = 'fzf_lua',
+      })
+    end,
+  },
+  {
+    'MeanderingProgrammer/render-markdown.nvim',
+    cond = is_vanilla,
+    dependencies = { 'nvim-treesitter/nvim-treesitter', 'echasnovski/mini.nvim' },
+    opts = {},
+  },
 
   -- Misc.
   {
@@ -231,10 +226,24 @@ return {
           textobject = '',
         }
       })
+      require('mini.ai').setup({
+        mappings = {
+          goto_left = 'g[',
+          goto_right = 'g]',
+        },
+      })
 
       if is_vanilla then
         require('mini.pairs').setup({})
+        require('mini.files').setup({
+        })
+        vim.keymap.set('n', '<leader>fe', '<cmd>:lua MiniFiles.open()<cr>', { noremap = true, silent = true, desc = 'File explorer' })
       end
     end
   },
+  {
+    "folke/snacks.nvim",
+    opts = {
+    }
+  }
 }

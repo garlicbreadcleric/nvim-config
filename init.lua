@@ -1,5 +1,4 @@
 require("config.lazy")
-
 local is_vanilla = not vim.g.vscode
 local is_vscode = not not vim.g.vscode
 
@@ -52,10 +51,10 @@ end
 
 if is_vscode then
   vim.keymap.set('n', '<leader>ff', vscode_action('workbench.action.quickOpen'), { noremap = true, silent = true, desc = 'Find file' })
-  vim.keymap.set('n', '<leader>bf', vscode_action('workbench.action.quickOpenPreviousRecentlyUsedEditorInGroup'), { noremap = true, silent = true, desc = 'Find file' })
   vim.keymap.set('n', '<leader>fo', vscode_action('workbench.action.files.openFile'), { noremap = true, silent = true, desc = 'Open file' })
-  vim.keymap.set('n', '<leader>fO', vscode_action('workbench.action.files.openFolder'), { noremap = true, silent = true, desc = 'Open folder' })
   vim.keymap.set('n', '<leader>fr', vscode_action('workbench.action.openRecent'), { noremap = true, silent = true, desc = 'Open recent' })
+  vim.keymap.set('n', '<leader>Fo', vscode_action('workbench.action.files.openFolder'), { noremap = true, silent = true, desc = 'Open folder' })
+  vim.keymap.set('n', '<leader>bf', vscode_action('workbench.action.quickOpenPreviousRecentlyUsedEditorInGroup'), { noremap = true, silent = true, desc = 'Find file' })
 end
 
 
@@ -78,9 +77,16 @@ end
 vim.o.number = true
 vim.opt.number = true
 vim.opt.wrap = false
+vim.api.nvim_create_autocmd("FileType", {
+    pattern = "markdown",
+    callback = function()
+        vim.opt_local.wrap = true   -- Enable line wrapping
+        vim.opt_local.linebreak = true -- Break lines at word boundaries
+    end,
+})
 
-map('n', 'j', 'gj', { noremap = true, silent = true })
-map('n', 'k', 'gk', { noremap = true, silent = true })
+vim.keymap.set({ 'n', 'v' }, 'j', 'gj', { noremap = true, silent = true })
+vim.keymap.set({ 'n', 'v' }, 'k', 'gk', { noremap = true, silent = true })
 
 map('n', '<C-h>', 'b', { noremap = true, silent = true, desc = 'Previous word' })
 map('i', '<C-h>', '<C-o>b', { noremap = true, silent = true, desc = 'Previous word' })
@@ -90,13 +96,13 @@ map('n', '<C-l>', 'w', { noremap = true, silent = true, desc = 'Next word' })
 map('i', '<C-l>', '<C-o>w', { noremap = true, silent = true, desc = 'Next word' })
 map('v', '<C-l>', 'w', { noremap = true, silent = true, desc = 'Next word' })
 
-map('n', '<C-j>', '8j', { noremap = true, silent = true, desc = 'Previous word' })
-map('i', '<C-j>', '<C-o>8j', { noremap = true, silent = true, desc = 'Previous word' })
-map('v', '<C-j>', '8j', { noremap = true, silent = true, desc = 'Previous word' })
+map('n', '<C-j>', '8gj', { noremap = true, silent = true, desc = 'Previous word' })
+map('i', '<C-j>', '<C-o>8gj', { noremap = true, silent = true, desc = 'Previous word' })
+map('v', '<C-j>', '8gj', { noremap = true, silent = true, desc = 'Previous word' })
 
-map('n', '<C-k>', '8k', { noremap = true, silent = true, desc = 'Next word' })
-map('i', '<C-k>', '<C-o>8k', { noremap = true, silent = true, desc = 'Next word' })
-map('v', '<C-k>', '8k', { noremap = true, silent = true, desc = 'Next word' })
+map('n', '<C-k>', '8gk', { noremap = true, silent = true, desc = 'Next word' })
+map('i', '<C-k>', '<C-o>8gk', { noremap = true, silent = true, desc = 'Next word' })
+map('v', '<C-k>', '8gk', { noremap = true, silent = true, desc = 'Next word' })
 
 local function jump_to_line_start()
   local col = vim.fn.col('.')
@@ -122,6 +128,55 @@ map('v', 'K', 'gg', { noremap = true, silent = true, desc = 'Start of buffer' })
 map('n', 'J', 'G', { noremap = true, silent = true, desc = 'End of buffer' })
 map('v', 'J', 'G', { noremap = true, silent = true, desc = 'End of buffer' })
 
+local function object_start_end(object)
+  local esc = vim.api.nvim_replace_termcodes('<esc>', true, false, true)
+
+  -- Save current cursor position and selection.
+  local init_cursor = vim.fn.getpos('.')
+  local init_start = nil
+  local init_end = nil
+  if vim.fn.mode() == 'v' or vim.fn.mode() == 'V' or vim.fn.mode() == 'CTRL-V' then
+    vim.api.nvim_feedkeys(esc, 'x', false)
+    init_start = vim.fn.getpos("'<")
+    init_end = vim.fn.getpos("'>")
+  end
+
+  -- Determine positions of textobject edges.
+  vim.cmd('normal! v' .. object)
+  vim.api.nvim_feedkeys(esc, 'x', false)
+  local object_start = vim.fn.getpos("'<")
+  local object_end = vim.fn.getpos("'>")
+
+  -- Restore original position.
+  if init_start and init_end then
+    if init_start[2] == init_cursor[2] and init_start[3] == init_cursor[3] then
+      vim.fn.setpos('.', init_end)
+      vim.cmd('normal! v')
+      vim.fn.setpos('.', init_start)
+    else
+      vim.fn.setpos('.', init_start)
+      vim.cmd('normal! v')
+      vim.fn.setpos('.', init_end)
+    end
+  else
+    vim.fn.setpos('.', init_cursor)
+  end
+
+  -- Jump to textobject start/end.
+  if init_cursor[2] == object_start[2] and init_cursor[3] == object_start[3] then
+    vim.fn.setpos('.', object_end)
+  else
+    vim.fn.setpos('.', object_start)
+  end
+end
+
+local function word_start_end()
+  object_start_end('iw')
+end
+
+vim.keymap.set('n', 'w', word_start_end, { noremap = true, desc = 'Toggle between start/end of word' })
+vim.keymap.set('v', 'w', word_start_end, { noremap = true, desc = 'Toggle between start/end of word' })
+
 
 -- Text editing.
 
@@ -136,7 +191,7 @@ if is_vanilla then
 end
 
 
--- LSP.
+-- Intellisense.
 
 if is_vanilla then
   local cmp = require('cmp')
@@ -156,10 +211,35 @@ if is_vanilla then
     ensure_installed = { 'ts_ls' }
   })
   require('lspconfig')['ts_ls'].setup({ capabilities = capabilities })
-  require('lspconfig')['marksman'].setup({ capabilities = capabilities })
+  -- require('lspconfig')['marksman'].setup({ capabilities = capabilities })
+
+  -- nnoremap <silent> <c-.> <cmd>lua vim.lsp.buf.code_action()<CR>
+  map('n', '<leader>ca', '<cmd>lua vim.lsp.buf.code_action()<cr>', { silent = true })
+  map('v', '<leader>ca', '<cmd>lua vim.lsp.buf.code_action()<cr>', { silent = true })
 end
 
 vim.keymap.set('n', 'gd', vim.lsp.buf.definition, { noremap = true, silent = true, desc = 'Go to definition' })
 -- vim.keymap.set('n', '<leader>ch', '<cmd>Lspsaga hover_doc<cr>', { noremap = true, silent = true })
 vim.keymap.set('n', 'gr', vim.lsp.buf.references, { noremap = true, silent = true, desc = 'Show references' })
 vim.keymap.set('n', 'gi', vim.lsp.buf.implementation, { noremap = true, silent = true, desc = 'Go to implementation' })
+
+-- vim.opt.foldenable = false
+vim.opt.foldlevelstart = 99
+if is_vanilla then
+  vim.opt.foldmethod = "expr"
+  vim.opt.foldexpr = "nvim_treesitter#foldexpr()"
+
+  function custom_fold_text()
+    local line = vim.fn.getline(vim.v.foldstart)
+    local lines_count = vim.v.foldend - vim.v.foldstart + 1
+    return line .. " ... " .. lines_count .. " lines "
+  end
+  vim.opt.foldtext = "v:lua.custom_fold_text()"
+  vim.opt.fillchars = { fold = ' ' }
+
+  vim.keymap.set({ 'n', 'v' }, '<m-[>', 'zc', { noremap = true, silent = true, desc = 'Close fold under cursor' })
+  vim.keymap.set('i', '<m-[>', '<c-o>zc', { noremap = true, silent = true, desc = 'Close fold under cursor' })
+  vim.keymap.set({ 'n', 'v' }, '<m-]>', 'zo', { noremap = true, silent = true, desc = 'Open fold under cursor' })
+  vim.keymap.set('i', '<m-]>', '<c-o>zo', { noremap = true, silent = true, desc = 'Open fold under cursor' })
+end
+
