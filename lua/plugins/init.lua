@@ -3,17 +3,6 @@ local is_vscode = not not vim.g.vscode
 
 return {
   -- Appearance.
-  -- {
-  --   'projekt0n/github-nvim-theme',
-  --   name = 'github-theme',
-  --   cond = is_vanilla,
-  --   lazy = false, -- make sure we load this during startup if it is your main colorscheme
-  --   priority = 1000, -- make sure to load this before all the other start plugins
-  --   config = function()
-  --     require('github-theme').setup({})
-  --     vim.cmd('colorscheme github_light')
-  --   end,
-  -- },
   {
     'maxmx03/solarized.nvim',
     lazy = false,
@@ -26,6 +15,11 @@ return {
       require('solarized').setup(opts)
       vim.cmd.colorscheme('solarized')
     end,
+  },
+  {
+    'stevearc/dressing.nvim',
+    lazy = false,
+    opts = {},
   },
 
   -- Help.
@@ -46,46 +40,24 @@ return {
   },
 
   -- File navigation.
-  -- {
-  --   "nvim-tree/nvim-tree.lua",
-  --   version = "*",
-  --   lazy = false,
-  --   cond = is_vanilla,
-  --   dependencies = {
-  --     "nvim-tree/nvim-web-devicons",
-  --   },
-  --   config = function()
-  --     require("nvim-tree").setup {}
-  --   end,
-  -- },
-  
-  -- Text navigation.
   {
-    'junegunn/fzf',
+    'nvim-telescope/telescope.nvim',
     cond = is_vanilla,
-  },
-  {
-    "ibhagwan/fzf-lua",
-    cond = is_vanilla,
-    dependencies = { "nvim-tree/nvim-web-devicons" },
-    config = function()
-      require("fzf-lua").setup({ fzf_colors = true })
-    end,
-    keys = {
-      { '<leader><leader>', '<cmd>FzfLua commands resume=true<cr>', desc = 'Command palette' },
-      { '<leader>ff', '<cmd>FzfLua files resume=true<cr>', desc = 'Find file' },
-      { '<leader>fs', '<cmd>FzfLua live_grep resume=true<cr>', desc = 'Search in files' },
-      { '<leader>bf', '<cmd>FzfLua buffers resume=true<cr>', desc = 'Find buffer' },
-      { '<leader>ca', '<cmd>FzfLua lsp_code_actions resume=true<cr>', desc = 'Code actions' },
-      { '<leader>cd', '<cmd>FzfLua lsp_definitions resume=true<cr>', desc = 'Code definitions' },
-      { '<leader>cs', '<cmd>FzfLua lsp_document_symbols resume=true<cr>', desc = 'Code symbols (document)' },
-      { '<leader>cS', '<cmd>FzfLua lsp_live_workspace_symbols resume=true<cr>', desc = 'Code symbols (workspace)' },
-      { '<leader>cr', '<cmd>FzfLua lsp_references resume=true<cr>', desc = 'Code references' },
-      { '<leader>ci', '<cmd>FzfLua lsp_implementations resume=true<cr>', desc = 'Code implementations' },
-      { '<leader>cw', '<cmd>FzfLua lsp_document_diagnostics resume=true<cr>', desc = 'Code warnings (document)' },
-      { '<leader>cW', '<cmd>FzfLua lsp_workspace_diagnostics resume=true<cr>', desc = 'Code warnings (workspace)' },
+    branch = '0.1.x',
+    dependencies = { 'nvim-lua/plenary.nvim', 'nvim-telescope/telescope-ui-select.nvim' },
+    opts = {
+      defaults = {
+        mappings = {
+          i = {
+            ['<C-j>'] = 'move_selection_next',
+            ['<C-k>'] = 'move_selection_previous',
+          },
+        },
+      },
     },
   },
+
+  -- Text navigation.
   {
     'rhysd/clever-f.vim',
     init = function()
@@ -244,7 +216,6 @@ return {
         jump = function(direction) require('luasnip').jump(direction) end,
       },
       sources = {
-        -- default = { 'lsp', 'path', 'luasnip', 'buffer' },
         completion = {
           enabled_providers = { 'lsp', 'path', 'luasnip', 'buffer', 'lazydev' },
         },
