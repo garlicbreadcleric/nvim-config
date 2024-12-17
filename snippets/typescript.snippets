@@ -1,0 +1,26 @@
+extends javascript
+
+snippet fn "function"
+	function ${1}(${2}): ${3:any} {
+		${0}
+	}
+
+snippet afn "async function"
+	async function ${1}(${2}): Promise<${3:any}> {
+		${0}
+	}
+
+snippet fori "for"
+	for (let ${1} = 0; ${1} < ${2}; ${1}++) {
+		${0}
+	}
+
+snippet forof "for of"
+	for (const ${1} of ${2}) {
+		${0}
+	}
+
+snippet aforof "for await of"
+	for await (const ${1} of ${2}) {
+		${0}
+	}

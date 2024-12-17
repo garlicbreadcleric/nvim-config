@@ -23,7 +23,7 @@ end
 -- Appearance.
 
 if is_vscode then
-  vim.cmd("syntax off")
+  vim.cmd('syntax off')
   vim.opt.relativenumber = false
   vim.opt.number = false
 else
@@ -58,7 +58,7 @@ if is_vscode then
   vim.keymap.set('n', '<leader>Fo', vscode_action('workbench.action.files.openFolder'), { noremap = true, silent = true, desc = 'Open folder' })
   vim.keymap.set('n', '<leader>bf', vscode_action('workbench.action.quickOpenPreviousRecentlyUsedEditorInGroup'), { noremap = true, silent = true, desc = 'Find file' })
 else
-  vim.keymap.set('n', '<leader>ff', '<cmd>Telescope find_files<cr>', { noremap = true, silent = true, desc = 'Find file' })
+  vim.keymap.set('n', '<leader>ff', '<cmd>Telescope find_files find_command=rg,--hidden,--files<cr>', { noremap = true, silent = true, desc = 'Find file' })
   vim.keymap.set('n', '<leader>bf', '<cmd>Telescope buffers<cr>', { noremap = true, silent = true, desc = 'Find file' })
 end
 
@@ -215,12 +215,15 @@ else
 end
 vim.keymap.set('n', '<leader>ca', vim.lsp.buf.code_action, { noremap = true, silent = true, desc = 'Code actions' })
 vim.keymap.set('n', '<leader>ch', vim.lsp.buf.hover, { noremap = true, silent = true, desc = 'Hover' })
+vim.keymap.set('n', '<leader>cr', vim.lsp.buf.rename, { noremap = true, silent = true, desc = 'Rename' })
 
 -- vim.opt.foldenable = false
 vim.opt.foldlevelstart = 99
 if is_vanilla then
   vim.opt.foldmethod = 'expr'
   vim.opt.foldexpr = 'nvim_treesitter#foldexpr()'
+
+  vim.cmd('TSEnable highlight')
 
   function CustomFoldText()
     local line = vim.fn.getline(vim.v.foldstart)
@@ -239,7 +242,22 @@ end
 
 -- Terminal.
 
+local scrollback = 100000;
+
 vim.keymap.set('t', '<esc><esc>', '<c-\\><c-n>', { noremap = true, silent = true, desc = 'Exit terminal mode' })
+vim.opt.scrollback = scrollback;
+
+local function clear_terminal()
+  vim.bo.scrollback = 1
+  vim.fn.feedkeys('', 'n')
+  vim.bo.scrollback = scrollback
+end
+
+vim.keymap.set('t', '<c-l>', clear_terminal, { silent = true, desc = 'Clear terminal '})
+
+vim.cmd('autocmd TermOpen * startinsert')
+vim.cmd('autocmd TermOpen * setlocal nonumber')
+vim.cmd('autocmd TermEnter * setlocal signcolumn=no')
 
 
 -- Version control.

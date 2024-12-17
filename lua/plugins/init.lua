@@ -39,6 +39,19 @@ return {
     },
   },
 
+  -- Project management.
+  {
+    'klen/nvim-config-local',
+    opts = {
+      config_files = { '.nvim.lua' },
+      hashfile = vim.fn.stdpath('data') .. '/config-local',
+      autocommands_create = true,
+      commands_create = true,
+      silent = false,
+      lookup_parents = true,
+    },
+  },
+
   -- File navigation.
   {
     'nvim-telescope/telescope.nvim',
@@ -49,8 +62,8 @@ return {
       defaults = {
         mappings = {
           i = {
-            ['<C-j>'] = 'move_selection_next',
-            ['<C-k>'] = 'move_selection_previous',
+            ['<c-j>'] = 'move_selection_next',
+            ['<c-k>'] = 'move_selection_previous',
           },
         },
       },
@@ -84,11 +97,12 @@ return {
     'nvim-treesitter/nvim-treesitter',
     config = function()
       if is_vscode then
-        vim.cmd("TSDisable highlight")
+        vim.cmd('TSDisable highlight')
       end
 
       local configs = require('nvim-treesitter.configs')
       configs.setup({
+        fold = { enable = true },
         ensure_installed = {
           'markdown',
           'javascript',
@@ -155,7 +169,7 @@ return {
     ft = 'lua',
     cond = is_vanilla,
     opts = {
-      library = { "~/.config/nvim" },
+      library = { '~/.config/nvim' },
     },
   },
   {
@@ -174,6 +188,7 @@ return {
       local servers = {
         ts_ls = {},
         lua_ls = {},
+        eslint = {},
       }
       local ensure_installed = vim.tbl_keys(servers or {})
 
@@ -194,14 +209,21 @@ return {
     end,
   },
   {
-    'saghen/blink.cmp',
-    version = 'v0.*',
+    'Saghen/blink.cmp',
+    version = 'v0.7.6',
     cond = is_vanilla,
     lazy = false,
-    dependencies = { 'L3MON4D3/LuaSnip', version = 'v2.*' },
+    dependencies = { 'L3MON4D3/LuaSnip' },
     opts = {
       keymap = {
         preset = 'super-tab',
+        ['<c-x>'] = { 'show', 'show_documentation', 'hide_documentation' },
+        ['<tab>'] = {
+          'snippet_forward',
+          'accept',
+          'fallback'
+        },
+        ['<c-y>'] = { 'select_and_accept', 'fallback' },
         ['<c-k>'] = { 'select_prev', 'fallback' },
         ['<c-j>'] = { 'select_next', 'fallback' },
       },
@@ -211,20 +233,32 @@ return {
           if filter and filter.direction then
             return require('luasnip').jumpable(filter.direction)
           end
-          return require('luasnip').in_snippet()
         end,
         jump = function(direction) require('luasnip').jump(direction) end,
       },
       sources = {
         completion = {
-          enabled_providers = { 'lsp', 'path', 'luasnip', 'buffer', 'lazydev' },
+          enabled_providers = { 'luasnip', 'lsp', 'path', 'buffer', 'lazydev' },
         },
         providers = {
           lsp = { fallback_for = { 'lazydev' } },
           lazydev = { name = 'LazyDev', module = 'lazydev.integrations.blink' },
+          luasnip = {
+            name = 'luasnip',
+            module = 'blink.cmp.sources.luasnip',
+
+            score_offset = -1,
+          },
         },
       },
     },
+  },
+  {
+    'L3MON4D3/LuaSnip',
+    version = 'v2.*',
+    config = function ()
+      require('luasnip.loaders.from_snipmate').lazy_load()
+    end,
   },
 
   -- Formatting.
@@ -234,9 +268,9 @@ return {
 
   -- Notes
   {
-    "zk-org/zk-nvim",
+    'zk-org/zk-nvim',
     config = function()
-      require("zk").setup({
+      require('zk').setup({
         picker = 'fzf_lua',
       })
     end,
@@ -264,23 +298,42 @@ return {
           textobject = '',
         }
       })
-      require('mini.ai').setup({
-        mappings = {
-          goto_left = 'g[',
-          goto_right = 'g]',
-        },
-      })
+      -- require('mini.ai').setup({
+      --   mappings = {
+      --     goto_left = 'g[',
+      --     goto_right = 'g]',
+      --   },
+      -- })
 
       if is_vanilla then
         require('mini.pairs').setup({})
+
+        local function mini_files_reveal()
+          local path = vim.bo.buftype ~= 'nofile' and vim.api.nvim_buf_get_name(0) or nil
+          MiniFiles.open(path)
+        end
         require('mini.files').setup({})
         vim.keymap.set('n', '<leader>fe', '<cmd>:lua MiniFiles.open()<cr>', { noremap = true, silent = true, desc = 'File explorer' })
+        vim.keymap.set('n', '<leader>fE', mini_files_reveal, { noremap = true, silent = true, desc = 'File explorer' })
       end
     end
   },
   {
-    "folke/snacks.nvim",
+    'folke/snacks.nvim',
     opts = {
-    }
+      words = { enabled = is_vanilla },
+      notifier = { enabled = is_vanilla },
+      rename = { enabled = is_vanilla },
+    },
+    config = function()
+      if is_vanilla then
+        vim.api.nvim_create_autocmd('User', {
+          pattern = 'MiniFilesActionRename',
+          callback = function(event)
+            Snacks.rename.on_rename_file(event.data.from, event.data.to)
+          end,
+        })
+      end
+    end,
   }
 }
