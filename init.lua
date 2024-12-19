@@ -16,7 +16,7 @@ end
 if is_vscode then
   vim.keymap.set('n', '<leader><leader>', vscode_action('workbench.action.showCommands'), { noremap = true, silent = true, desc = 'Command palette' })
 else
-  vim.keymap.set('n', '<leader><leader>', '<cmd>Telescope commands<cr>', { noremap = true, silent = true, desc = 'Command palette' })
+  vim.keymap.set('n', '<leader><leader>', '<cmd>FzfLua commands<cr>', { noremap = true, silent = true, desc = 'Command palette' })
 end
 
 
@@ -26,10 +26,25 @@ if is_vscode then
   vim.cmd('syntax off')
   vim.opt.relativenumber = false
   vim.opt.number = false
-else
-  vim.opt.relativenumber = false
-  vim.opt.number = true
-  vim.opt.signcolumn = 'yes'
+end
+
+vim.opt.number = true
+vim.opt.signcolumn = 'yes'
+
+if is_vanilla then
+  vim.api.nvim_create_autocmd("FileType", {
+    pattern = "*",
+    callback = function()
+      if vim.bo.filetype == 'markdown' then
+        vim.opt_local.wrap = true
+        vim.opt_local.linebreak = true
+        vim.opt_local.breakindent = true
+      else
+        vim.opt_local.wrap = false
+        vim.opt_local.linebreak = false
+      end
+    end,
+  })
 end
 
 
@@ -45,7 +60,7 @@ map('n', '<leader>h', ':nohlsearch<CR>', { noremap = true, silent = true, desc =
 if is_vscode then
   vim.keymap.set('n', '<leader>fs', vscode_action('workbench.action.findInFiles'), { noremap = true, silent = true, desc = 'Find in files' })
 else
-  vim.keymap.set('n', '<leader>fs', '<cmd>Telescope live_grep<cr>', { noremap = true, silent = true, desc = 'Find in files' })
+  vim.keymap.set('n', '<leader>fs', '<cmd>FzfLua live_grep<cr>', { noremap = true, silent = true, desc = 'Find in files' })
 end
 
 
@@ -58,8 +73,8 @@ if is_vscode then
   vim.keymap.set('n', '<leader>Fo', vscode_action('workbench.action.files.openFolder'), { noremap = true, silent = true, desc = 'Open folder' })
   vim.keymap.set('n', '<leader>bf', vscode_action('workbench.action.quickOpenPreviousRecentlyUsedEditorInGroup'), { noremap = true, silent = true, desc = 'Find file' })
 else
-  vim.keymap.set('n', '<leader>ff', '<cmd>Telescope find_files find_command=rg,--hidden,--files<cr>', { noremap = true, silent = true, desc = 'Find file' })
-  vim.keymap.set('n', '<leader>bf', '<cmd>Telescope buffers<cr>', { noremap = true, silent = true, desc = 'Find file' })
+  vim.keymap.set('n', '<leader>ff', '<cmd>FzfLua files<cr>', { noremap = true, silent = true, desc = 'Find file' })
+  vim.keymap.set('n', '<leader>bf', '<cmd>FzfLua buffers<cr>', { noremap = true, silent = true, desc = 'Find file' })
 end
 
 
@@ -79,17 +94,6 @@ end
 
 -- Text navigation.
 
-vim.o.number = true
-vim.opt.number = true
-vim.opt.wrap = false
-vim.opt.breakindent = true
-vim.api.nvim_create_autocmd("FileType", {
-  pattern = "markdown",
-  callback = function()
-    vim.opt_local.wrap = true
-    vim.opt_local.linebreak = true
-  end,
-})
 
 vim.keymap.set({ 'n', 'v' }, 'j', 'gj', { noremap = true, silent = true })
 vim.keymap.set({ 'n', 'v' }, 'k', 'gk', { noremap = true, silent = true })
@@ -122,8 +126,6 @@ end
 
 vim.keymap.set('n', 'H', jump_to_line_start, { noremap = true, desc = 'Start of line' })
 vim.keymap.set('v', 'H', jump_to_line_start, { noremap = true, desc = 'Start of line' })
--- map('n', 'H', '^', { noremap = true, silent = true, desc = 'Start of line' })
--- map('v', 'H', '^', { noremap = true, silent = true, desc = 'Start of line' })
 
 map('n', 'L', '$', { noremap = true, silent = true, desc = 'End of line' })
 map('v', 'L', '$', { noremap = true, silent = true, desc = 'End of line' })
@@ -199,25 +201,68 @@ end
 
 -- Intellisense.
 
+local function show_hover()
+  local bufnr = vim.api.nvim_get_current_buf()
+  local cursor_pos = vim.api.nvim_win_get_cursor(0)
+  local line = cursor_pos[1] - 1
+
+  local diagnostics = vim.diagnostic.get(bufnr, { lnum = line })
+  -- local has_diagnostics = diagnostics and #diagnostics > 0
+
+  vim.lsp.buf_request(bufnr, "textDocument/hover", vim.lsp.util.make_position_params(), function(_, result)
+    local contents = {}
+
+    -- Add hover information if available
+    if result and result.contents then
+      local hover_content = vim.lsp.util.convert_input_to_markdown_lines(result.contents)
+      for _, line in ipairs(hover_content) do
+        table.insert(contents, line)
+      end
+    end
+
+    if diagnostics and #diagnostics > 0 then
+      if #contents > 0 then table.insert(contents, '---') end
+      for _, diag in ipairs(diagnostics) do
+        table.insert(contents, diag.message)
+      end
+    end
+
+    if #contents > 0 then
+      vim.lsp.util.open_floating_preview(contents, "markdown", {
+        focusable = false,
+        -- border = "rounded",
+        -- pad_left = 0,
+        -- pad_right = 0,
+        -- pad_top = 0,
+        -- pad_bottom = 0,
+      })
+    end
+  end)
+end
+
 if is_vanilla then
-  vim.keymap.set('n', 'gd', '<cmd>Telescope lsp_definitions<cr>', { noremap = true, silent = true, desc = 'Go to definition' })
-  vim.keymap.set('n', 'gr', '<cmd>Telescope lsp_references<cr>', { noremap = true, silent = true, desc = 'Show references' })
-  vim.keymap.set('n', 'gi', '<cmd>Telescope lsp_implementations<cr>', { noremap = true, silent = true, desc = 'Go to implementation'})
-  vim.keymap.set('n', '<leader>cs', '<cmd>Telescope lsp_document_symbols<cr>', { noremap = true, silent = true, desc = 'Document symbols' })
-  vim.keymap.set('n', '<leader>cS', '<cmd>Telescope lsp_workspace_symbols<cr>', { noremap = true, silent = true, desc = 'Workspace symbols' })
-  vim.keymap.set('n', '<leader>cd', '<cmd>Telescope diagnostics buffer=0<cr>', { noremap = true, silent = true, desc = 'Show diagnostics' })
+  vim.keymap.set('n', 'gd', '<cmd>FzfLua lsp_definitions jump_to_single_result=true<cr>', { noremap = true, silent = true, desc = 'Go to definition' })
+  vim.keymap.set('n', 'gr', '<cmd>FzfLua lsp_references jump_to_single_result=true<cr>', { noremap = true, silent = true, desc = 'Show references' })
+  vim.keymap.set('n', 'gi', '<cmd>FzfLua lsp_implementations jump_to_single_result=true<cr>', { noremap = true, silent = true, desc = 'Go to implementation'})
+  vim.keymap.set('n', 'gt', '<cmd>FzfLua lsp_type_definitions jump_to_single_result=true<cr>', { noremap = true, silent = true, desc = 'Go to type definition'})
+  vim.keymap.set('n', '<leader>cs', '<cmd>FzfLua lsp_document_symbols<cr>', { noremap = true, silent = true, desc = 'Document symbols' })
+  vim.keymap.set('n', '<leader>cS', '<cmd>FzfLua lsp_workspace_symbols<cr>', { noremap = true, silent = true, desc = 'Workspace symbols' })
+  vim.keymap.set('n', '<leader>cd', '<cmd>FzfLua diagnostics_document<cr>', { noremap = true, silent = true, desc = 'Find diagnostic' })
+  vim.keymap.set('n', '<leader>ch', show_hover, { noremap = true, silent = true, desc = 'Hover' })
 else
   vim.keymap.set('n', 'gd', vim.lsp.buf.definition, { noremap = true, silent = true, desc = 'Go to definition' })
   vim.keymap.set('n', 'gr', vim.lsp.buf.references, { noremap = true, silent = true, desc = 'Show references' })
   vim.keymap.set('n', 'gi', vim.lsp.buf.implementation, { noremap = true, silent = true, desc = 'Go to implementation' })
+  vim.keymap.set('n', 'gt', vim.lsp.buf.type_definition, { noremap = true, silent = true, desc = 'Go to type definition' })
   vim.keymap.set('n', '<leader>cs', vim.lsp.buf.document_symbol, { noremap = true, silent = true, desc = 'Document symbols' })
   vim.keymap.set('n', '<leader>cS', vim.lsp.buf.workspace_symbol, { noremap = true, silent = true, desc = 'Workspace symbols' })
+  vim.keymap.set('n', '<leader>ch', vim.lsp.buf.hover, { noremap = true, silent = true, desc = 'Hover' })
 end
+
 vim.keymap.set('n', '<leader>ca', vim.lsp.buf.code_action, { noremap = true, silent = true, desc = 'Code actions' })
-vim.keymap.set('n', '<leader>ch', vim.lsp.buf.hover, { noremap = true, silent = true, desc = 'Hover' })
+vim.keymap.set('v', '<leader>ca', vim.lsp.buf.code_action, { noremap = true, silent = true, desc = 'Code actions' })
 vim.keymap.set('n', '<leader>cr', vim.lsp.buf.rename, { noremap = true, silent = true, desc = 'Rename' })
 
--- vim.opt.foldenable = false
 vim.opt.foldlevelstart = 99
 if is_vanilla then
   vim.opt.foldmethod = 'expr'
@@ -263,8 +308,8 @@ vim.cmd('autocmd TermEnter * setlocal signcolumn=no')
 -- Version control.
 
 if is_vanilla then
-  vim.keymap.set('n', '<leader>gc', '<cmd>Telescope git_bcommits<cr>', { noremap = true, silent = true, desc = 'Find Git commit' })
-  vim.keymap.set('n', '<leader>gb', '<cmd>Telescope git_branches<cr>', { noremap = true, silent = true, desc = 'Find Git branch' })
-  vim.keymap.set('n', '<leader>gs', '<cmd>Telescope git_status<cr>', { noremap = true, silent = true, desc = 'Git status' })
+  vim.keymap.set('n', '<leader>gc', '<cmd>FzfLua git_bcommits<cr>', { noremap = true, silent = true, desc = 'Find Git commit' })
+  vim.keymap.set('n', '<leader>gb', '<cmd>FzfLua git_branches<cr>', { noremap = true, silent = true, desc = 'Find Git branch' })
+  vim.keymap.set('n', '<leader>gs', '<cmd>FzfLua git_status<cr>', { noremap = true, silent = true, desc = 'Git status' })
 end
 

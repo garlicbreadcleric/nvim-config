@@ -54,20 +54,16 @@ return {
 
   -- File navigation.
   {
-    'nvim-telescope/telescope.nvim',
+    'junegunn/fzf',
     cond = is_vanilla,
-    branch = '0.1.x',
-    dependencies = { 'nvim-lua/plenary.nvim', 'nvim-telescope/telescope-ui-select.nvim' },
-    opts = {
-      defaults = {
-        mappings = {
-          i = {
-            ['<c-j>'] = 'move_selection_next',
-            ['<c-k>'] = 'move_selection_previous',
-          },
-        },
-      },
-    },
+  },
+  {
+    "ibhagwan/fzf-lua",
+    cond = is_vanilla,
+    dependencies = { "nvim-tree/nvim-web-devicons" },
+    config = function()
+      require("fzf-lua").setup({ 'borderless_full', fzf_colors = true })
+    end,
   },
 
   -- Text navigation.
@@ -203,29 +199,29 @@ return {
           end,
         },
       }
-
-      vim.keymap.set('n', '<leader>ca', '<cmd>lua vim.lsp.buf.code_action()<cr>', { silent = true })
-      vim.keymap.set('v', '<leader>ca', '<cmd>lua vim.lsp.buf.code_action()<cr>', { silent = true })
     end,
   },
   {
     'Saghen/blink.cmp',
-    version = 'v0.7.6',
+    -- version = 'v0.*',
+    build = 'cargo build --release',
     cond = is_vanilla,
     lazy = false,
     dependencies = { 'L3MON4D3/LuaSnip' },
     opts = {
       keymap = {
-        preset = 'super-tab',
         ['<c-x>'] = { 'show', 'show_documentation', 'hide_documentation' },
+        ['<c-e>'] = { 'cancel', 'fallback' },
         ['<tab>'] = {
           'snippet_forward',
           'accept',
-          'fallback'
+          'fallback',
         },
         ['<c-y>'] = { 'select_and_accept', 'fallback' },
         ['<c-k>'] = { 'select_prev', 'fallback' },
+        ['<up>'] = { 'select_prev', 'fallback' },
         ['<c-j>'] = { 'select_next', 'fallback' },
+        ['<down>'] = { 'select_next', 'fallback' },
       },
       snippets = {
         expand = function(snippet) require('luasnip').lsp_expand(snippet) end,
@@ -237,12 +233,14 @@ return {
         jump = function(direction) require('luasnip').jump(direction) end,
       },
       sources = {
-        completion = {
-          enabled_providers = { 'luasnip', 'lsp', 'path', 'buffer', 'lazydev' },
-        },
+        default = { 'luasnip', 'lsp', 'path', 'buffer', 'lazydev' },
         providers = {
-          lsp = { fallback_for = { 'lazydev' } },
-          lazydev = { name = 'LazyDev', module = 'lazydev.integrations.blink' },
+          lsp = {},
+          lazydev = {
+            name = 'LazyDev',
+            module = 'lazydev.integrations.blink',
+            fallbacks = { 'lsp' },
+          },
           luasnip = {
             name = 'luasnip',
             module = 'blink.cmp.sources.luasnip',
@@ -287,7 +285,6 @@ return {
     'echasnovski/mini.nvim',
     version = '*',
     config = function()
-      -- require('mini.bracketed').setup({})
       require('mini.move').setup({})
       require('mini.surround').setup({})
       require('mini.comment').setup({
@@ -298,12 +295,6 @@ return {
           textobject = '',
         }
       })
-      -- require('mini.ai').setup({
-      --   mappings = {
-      --     goto_left = 'g[',
-      --     goto_right = 'g]',
-      --   },
-      -- })
 
       if is_vanilla then
         require('mini.pairs').setup({})
@@ -313,8 +304,8 @@ return {
           MiniFiles.open(path)
         end
         require('mini.files').setup({})
-        vim.keymap.set('n', '<leader>fe', '<cmd>:lua MiniFiles.open()<cr>', { noremap = true, silent = true, desc = 'File explorer' })
-        vim.keymap.set('n', '<leader>fE', mini_files_reveal, { noremap = true, silent = true, desc = 'File explorer' })
+        vim.keymap.set('n', '<leader>fE', '<cmd>:lua MiniFiles.open()<cr>', { noremap = true, silent = true, desc = 'File explorer' })
+        vim.keymap.set('n', '<leader>fe', mini_files_reveal, { noremap = true, silent = true, desc = 'File explorer' })
       end
     end
   },
@@ -325,7 +316,8 @@ return {
       notifier = { enabled = is_vanilla },
       rename = { enabled = is_vanilla },
     },
-    config = function()
+    config = function(_, opts)
+      require('snacks').setup(opts)
       if is_vanilla then
         vim.api.nvim_create_autocmd('User', {
           pattern = 'MiniFilesActionRename',
