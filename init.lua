@@ -1,4 +1,4 @@
-require("config.lazy")
+require('config.lazy')
 local is_vanilla = not vim.g.vscode
 local is_vscode = not not vim.g.vscode
 
@@ -30,20 +30,22 @@ end
 
 vim.opt.number = true
 vim.opt.signcolumn = 'yes'
+vim.opt.wrap = false
+vim.opt.linebreak = false
 
 if is_vanilla then
-  vim.api.nvim_create_autocmd("FileType", {
-    pattern = "*",
+  vim.api.nvim_create_autocmd('FileType', {
+    pattern = '*',
     callback = function()
-      if vim.bo.filetype == 'markdown' then
+      if vim.bo.filetype == 'markdown' and vim.bo.buftype ~= 'nofile' then
         vim.opt_local.wrap = true
         vim.opt_local.linebreak = true
         vim.opt_local.breakindent = true
-      else
-        vim.opt_local.wrap = false
-        vim.opt_local.linebreak = false
+        vim.opt_local.number = false
+        vim.opt_local.signcolumn = 'no'
       end
     end,
+    group = vim.api.nvim_create_augroup('MarkdownSettings', { clear = true }),
   })
 end
 
@@ -73,6 +75,9 @@ if is_vscode then
   vim.keymap.set('n', '<leader>Fo', vscode_action('workbench.action.files.openFolder'), { noremap = true, silent = true, desc = 'Open folder' })
   vim.keymap.set('n', '<leader>bf', vscode_action('workbench.action.quickOpenPreviousRecentlyUsedEditorInGroup'), { noremap = true, silent = true, desc = 'Find file' })
 else
+  vim.keymap.set('n', '[[', '<c-o>', { noremap = true, silent = true, desc = 'Jump back' })
+  vim.keymap.set('n', ']]', '<c-i>', { noremap = true, silent = true, desc = 'Jump forward' })
+
   vim.keymap.set('n', '<leader>ff', '<cmd>FzfLua files<cr>', { noremap = true, silent = true, desc = 'Find file' })
   vim.keymap.set('n', '<leader>bf', '<cmd>FzfLua buffers<cr>', { noremap = true, silent = true, desc = 'Find file' })
 end
@@ -118,9 +123,9 @@ local function jump_to_line_start()
   local col = vim.fn.col('.')
   local first_non_blank = vim.fn.indent(vim.fn.line('.')) + 1
   if col == first_non_blank then
-    vim.cmd("normal! 0")
+    vim.cmd('normal! 0')
   else
-    vim.cmd("normal! ^")
+    vim.cmd('normal! ^')
   end
 end
 
@@ -209,7 +214,7 @@ local function show_hover()
   local diagnostics = vim.diagnostic.get(bufnr, { lnum = line })
   -- local has_diagnostics = diagnostics and #diagnostics > 0
 
-  vim.lsp.buf_request(bufnr, "textDocument/hover", vim.lsp.util.make_position_params(), function(_, result)
+  vim.lsp.buf_request(bufnr, 'textDocument/hover', vim.lsp.util.make_position_params(), function(_, result)
     local contents = {}
 
     -- Add hover information if available
@@ -228,9 +233,9 @@ local function show_hover()
     end
 
     if #contents > 0 then
-      vim.lsp.util.open_floating_preview(contents, "markdown", {
+      vim.lsp.util.open_floating_preview(contents, 'markdown', {
         focusable = false,
-        -- border = "rounded",
+        -- border = 'rounded',
         -- pad_left = 0,
         -- pad_right = 0,
         -- pad_top = 0,
@@ -312,4 +317,10 @@ if is_vanilla then
   vim.keymap.set('n', '<leader>gb', '<cmd>FzfLua git_branches<cr>', { noremap = true, silent = true, desc = 'Find Git branch' })
   vim.keymap.set('n', '<leader>gs', '<cmd>FzfLua git_status<cr>', { noremap = true, silent = true, desc = 'Git status' })
 end
+
+
+-- Misc.
+
+vim.opt.laststatus = 3
+vim.opt.splitkeep = 'screen'
 

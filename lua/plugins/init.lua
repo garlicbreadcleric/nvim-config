@@ -39,7 +39,7 @@ return {
     },
   },
 
-  -- Project management.
+  -- Workspaces.
   {
     'klen/nvim-config-local',
     opts = {
@@ -49,6 +49,52 @@ return {
       commands_create = true,
       silent = false,
       lookup_parents = true,
+    },
+  },
+  {
+    'stevearc/resession.nvim',
+    cond = is_vanilla,
+    lazy = false,
+    opts = {
+      autosave = {
+        enabled = true,
+        interval = 60,
+        notify = true,
+      },
+    },
+    config = function (_, opts)
+      local resession = require('resession')
+      resession.setup(opts)
+      vim.api.nvim_create_autocmd('VimEnter', {
+        callback = function()
+          if vim.fn.argc(-1) == 0 then
+            resession.load(vim.fn.getcwd(), { dir = 'dirsession', silence_errors = true })
+          end
+        end,
+        nested = true,
+      })
+      vim.api.nvim_create_autocmd('VimLeavePre', {
+        callback = function()
+          resession.save(vim.fn.getcwd(), { dir = 'dirsession', notify = false })
+        end,
+      })
+    end
+  },
+  {
+    'stevearc/stickybuf.nvim',
+    cond = is_vanilla,
+    lazy = false,
+    keys = {
+      { '<leader>wp', '<cmd>PinBuffer<cr>', { noremap = true, silent = true, desc = 'Pin buffer to window' } }
+    },
+    opts = {
+      get_auto_pin = function (buf)
+        local path = vim.api.nvim_buf_get_name(buf)
+        local name = vim.fn.fnamemodify(path, ':t')
+        if name == 'todo.md' or name == 'done.md' then
+          return 'bufnr'
+        end
+      end,
     },
   },
 
@@ -77,15 +123,15 @@ return {
   },
 
   -- Text editing.
-  {
-    'AndrewRadev/switch.vim',
-    keys = {
-      { ',s', '<cmd>Switch<cr>', desc = 'Switch' },
-    },
-    init = function()
-      vim.g.switch_mapping = ''
-    end,
-  },
+  -- {
+  --   'AndrewRadev/switch.vim',
+  --   keys = {
+  --     { ',s', '<cmd>Switch<cr>', desc = 'Switch' },
+  --   },
+  --   init = function()
+  --     vim.g.switch_mapping = ''
+  --   end,
+  -- },
 
   -- Intellisense.
   { 'nvim-treesitter/nvim-treesitter-textobjects' },
@@ -103,6 +149,7 @@ return {
           'markdown',
           'javascript',
           'typescript',
+          'tsx',
           'lua',
           'python'
         },
@@ -182,9 +229,11 @@ return {
       capabilities = require('blink.cmp').get_lsp_capabilities(capabilities)
 
       local servers = {
-        ts_ls = {},
+        -- ts_ls = {},
+        vtsls = {},
         lua_ls = {},
         eslint = {},
+        ['js-debug-adapter'] = {},
       }
       local ensure_installed = vim.tbl_keys(servers or {})
 
@@ -262,6 +311,16 @@ return {
   -- Formatting.
   {
     'editorconfig/editorconfig-vim'
+  },
+
+  -- Terminal.
+  {
+    'akinsho/toggleterm.nvim',
+    version = "*",
+    opts = {
+      open_mapping = [[<c-\>]],
+      shade_terminals = false,
+    },
   },
 
   -- Notes
