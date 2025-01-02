@@ -66,13 +66,11 @@ inoremap <C-h> <C-o>b
 noremap <C-l> w
 inoremap <C-l> <C-o>w
 
-noremap <C-j> 8j
-" inoremap <C-j> <C-o>8j
-noremap <C-k> 8k
-" inoremap <C-k> <C-o>8k
+noremap <C-j> 5gj
+noremap <C-k> 5gk
 
-noremap H ^
-noremap L $
+noremap H g^
+noremap L g$
 
 noremap J G
 noremap K gg
