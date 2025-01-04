@@ -1,0 +1,91 @@
+set editorcmd kitty -e nvim %f
+
+unbind ;#
+unbind ;:
+unbind ;;
+unbind ;A
+unbind ;B
+unbind ;C
+unbind ;D
+unbind ;E
+unbind ;F
+unbind ;G
+unbind ;H
+unbind ;I
+unbind ;J
+unbind ;K
+unbind ;L
+unbind ;M
+unbind ;N
+unbind ;O
+unbind ;P
+unbind ;Q
+unbind ;R
+unbind ;S
+unbind ;T
+unbind ;U
+unbind ;V
+unbind ;W
+unbind ;X
+unbind ;Y
+unbind ;Z
+unbind ;a
+unbind ;b
+unbind ;c
+unbind ;d
+unbind ;e
+unbind ;f
+unbind ;g
+unbind ;g#
+unbind ;g;
+unbind ;gA
+unbind ;gF
+unbind ;gI
+unbind ;gP
+unbind ;gS
+unbind ;ga
+unbind ;gb
+unbind ;gd
+unbind ;gf
+unbind ;gi
+unbind ;gk
+unbind ;gp
+unbind ;gr
+unbind ;gs
+unbind ;gv
+unbind ;gw
+unbind ;gy
+unbind ;h
+unbind ;i
+unbind ;j
+unbind ;k
+unbind ;l
+unbind ;m
+unbind ;n
+unbind ;o
+unbind ;p
+unbind ;q
+unbind ;r
+unbind ;s
+unbind ;t
+unbind ;u
+unbind ;v
+unbind ;w
+unbind ;x
+unbind ;y
+unbind ;z
+unbind <C-b>
+unbind <C-f>
+unbind [[
+unbind [c
+unbind ]]
+unbind ]c
+
+bind ; fillcmdline_notrail
+bind [ back
+bind ] forward
+bind H tabprev
+bind L tabnext
+bind K scrollto 0
+bind J scrollto 100
+bind ,, hint -; *
