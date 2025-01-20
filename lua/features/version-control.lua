@@ -5,7 +5,8 @@ local plugins = {}
 
 pkg.add(plugins, {
   'sindrets/diffview.nvim',
-  cond = env.is_vanilla,
+  cond = not env.is_vscode,
+  lazy = false,
   keys = {
     { '<leader>gd', '<cmd>DiffviewOpen<cr>', desc = 'Git diff' },
     { '<leader>gh', '<cmd>DiffviewFileHistory %<cr>', desc = 'Git history (current file)' },
@@ -14,6 +15,11 @@ pkg.add(plugins, {
   opts = function()
     local actions = require('diffview.actions')
     return {
+      view = {
+        merge_tool = {
+          layout = 'diff1_plain',
+        },
+      },
       keymaps = {
         view = {
           { 'n', '<tab>', actions.select_next_entry, { desc = 'Next file diff' } },
@@ -32,14 +38,16 @@ pkg.add(plugins, {
       },
     }
   end,
-  setup = function(_, opts)
-    require('diffview').setup(opts)
-  end,
+  main = 'diffview',
+  setup = true,
+  -- setup = function(_, opts)
+  --   require('diffview').setup(opts)
+  -- end,
 })
 
 pkg.add(plugins, {
   'lewis6991/gitsigns.nvim',
-  cond = env.is_vanilla,
+  cond = not env.is_vscode,
   lazy = false,
   opts = {
     current_line_blame = true,
@@ -77,22 +85,22 @@ pkg.add(plugins, {
   },
 })
 
-pkg.add(plugins, {
-  'NeogitOrg/neogit',
-  cond = env.is_vanilla,
-  dependencies = {
-    'nvim-lua/plenary.nvim',
-    'sindrets/diffview.nvim',
-    'ibhagwan/fzf-lua',
-  },
-  opts = {
-    kind = 'floating',
-  },
-  config = true,
-  keys = {
-    { '<leader>gs', '<cmd>Neogit<cr>', desc = 'Git status' },
-  },
-})
+-- pkg.add(plugins, {
+--   'NeogitOrg/neogit',
+--   cond = env.is_vanilla,
+--   dependencies = {
+--     'nvim-lua/plenary.nvim',
+--     'sindrets/diffview.nvim',
+--     'ibhagwan/fzf-lua',
+--   },
+--   opts = {
+--     kind = 'floating',
+--   },
+--   config = true,
+--   keys = {
+--     { '<leader>gs', '<cmd>Neogit<cr>', desc = 'Git status' },
+--   },
+-- })
 
 if env.is_vanilla then
   vim.keymap.set(

@@ -9,11 +9,32 @@ pkg.add(plugins, {
   cond = env.is_vanilla,
 })
 
+local function grep_replace(selected, opts)
+  -- TODO: Open new fzf-lua preview for search & replace.
+
+  -- vim.api.nvim_put({ opts.last_query }, 'c', true, true)
+end
+
+pkg.add(plugins, {
+  'nvim-neo-tree/neo-tree.nvim',
+  cond = not env.is_vscode,
+  branch = 'v3.x',
+  dependencies = {
+    'nvim-lua/plenary.nvim',
+    'nvim-tree/nvim-web-devicons',
+    'MunifTanjim/nui.nvim',
+  },
+  keys = {
+    { '<leader>ft', '<cmd>Neotree toggle<cr>', desc = 'Toggle file tree' },
+  },
+})
+
 pkg.add(plugins, {
   'ibhagwan/fzf-lua',
   cond = env.is_vanilla,
   dependencies = { 'nvim-tree/nvim-web-devicons' },
   opts = function()
+    local actions = require('fzf-lua.actions')
     return {
       fzf_colors = true,
       winopts = { backdrop = 100 },
@@ -23,6 +44,11 @@ pkg.add(plugins, {
           ['tab'] = 'toggle',
           ['ctrl-a'] = 'select-all',
           ['ctrl-x'] = 'deselect-all',
+        },
+      },
+      grep = {
+        actions = {
+          ['ctrl-r'] = grep_replace,
         },
       },
     }

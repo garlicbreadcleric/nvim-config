@@ -11,6 +11,8 @@ vim.opt.hlsearch = true
 
 vim.opt.scrollback = const.TERMINAL_SCROLLBACK
 
+vim.g.no_python_maps = true
+
 if env.is_vscode then
   vim.cmd('syntax off')
   vim.opt.relativenumber = false

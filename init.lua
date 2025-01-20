@@ -18,6 +18,7 @@ end
 vim.opt.rtp:prepend(lazypath)
 
 require('options')
+Lib = require('lib')
 
 require('lazy').setup({
   spec = {
@@ -25,6 +26,7 @@ require('lazy').setup({
   },
   install = { colorscheme = { 'solarized' } },
   checker = { enabled = true },
+  rocks = { hererocks = true },
 })
 
 vim.keymap.set('n', ';', ':', { noremap = true, silent = false })

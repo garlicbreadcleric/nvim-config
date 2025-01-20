@@ -12,8 +12,9 @@ return {
       keymap = {
         ['<c-x>'] = { 'show', 'show_documentation', 'hide_documentation' },
         ['<c-e>'] = { 'cancel', 'fallback' },
-        ['<tab>'] = { 'snippet_forward', 'accept', 'fallback' },
-        ['<c-y>'] = { 'select_and_accept', 'fallback' },
+        ['<tab>'] = { 'accept', 'fallback' },
+        ['<c-l>'] = { 'snippet_forward', 'fallback' },
+        ['<c-h>'] = { 'snippet_backward', 'fallback' },
         ['<c-k>'] = { 'select_prev', 'fallback' },
         ['<up>'] = { 'select_prev', 'fallback' },
         ['<c-j>'] = { 'select_next', 'fallback' },

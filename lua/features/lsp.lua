@@ -13,53 +13,75 @@ pkg.add(plugins, {
 })
 
 pkg.add(plugins, {
+  'pmizio/typescript-tools.nvim',
+  dependencies = { 'nvim-lua/plenary.nvim', 'neovim/nvim-lspconfig' },
+  opts = {},
+})
+
+pkg.add(plugins, {
   'neovim/nvim-lspconfig',
   cond = not env.is_vscode,
   dependencies = {
     'williamboman/mason.nvim',
     'williamboman/mason-lspconfig.nvim',
     'WhoIsSethDaniel/mason-tool-installer.nvim',
-    'Saghen/blink.cmp',
   },
   config = function()
-    local capabilities = vim.lsp.protocol.make_client_capabilities()
-    capabilities = require('blink.cmp').get_lsp_capabilities(capabilities)
-
-    local servers = {
-      vtsls = {
-        settings = {
-          ['typescript.format.enable'] = false,
-          ['javascript.format.enable'] = false,
-        },
-      },
-      lua_ls = {},
-      eslint = {},
-      ['js-debug-adapter'] = {},
-    }
-    local ensure_installed = vim.tbl_keys(servers or {})
-
     require('mason').setup()
-    require('mason-tool-installer').setup({ ensure_installed = ensure_installed })
-    require('mason-lspconfig').setup({
-      handlers = {
-        function(server_name)
-          local server = servers[server_name] or {}
-          server.capabilities = vim.tbl_deep_extend('force', {}, capabilities, server.capabilities or {})
-          require('lspconfig')[server_name].setup(server)
-        end,
+    require('mason-tool-installer').setup({
+      ensure_installed = {
+        -- JavaScript/Typescript.
+        -- 'vtsls',
+        'eslint_d',
+        'js-debug-adapter',
+        'prettierd',
+
+        -- Python.
+        'pyright',
+
+        -- Lua.
+        'lua_ls',
       },
     })
+    require('mason-lspconfig').setup()
+
+    -- require('lspconfig').vtsls.setup({
+    --   settings = {
+    --     ['typescript.format.enable'] = false,
+    --     ['javascript.format.enable'] = false,
+    --   },
+    -- })
+    require('lspconfig').lua_ls.setup({})
+    require('lspconfig').pyright.setup({})
   end,
 })
 
 pkg.add(plugins, {
   'ray-x/lsp_signature.nvim',
+  cond = not env.is_vscode,
   opts = {
     hint_prefix = '',
   },
   config = function(_, opts)
     require('lsp_signature').setup(opts)
   end,
+})
+
+pkg.add(plugins, {
+  'hedyhli/outline.nvim',
+  cond = not env.is_vscode,
+  keys = {
+    { '<leader>co', '<cmd>Outline<cr>', desc = 'Toggle outline' },
+  },
+  main = 'outline',
+  opts = {},
+  config = true,
+})
+
+pkg.add(plugins, {
+  'j-hui/fidget.nvim',
+  cond = not env.is_vscode,
+  opts = {},
 })
 
 local function show_hover()
@@ -107,7 +129,11 @@ local function lsp_definitions()
   if env.is_vscode then
     vim.lsp.buf.definition()
   else
-    require('fzf-lua').lsp_definitions({ jump_to_single_result = true })
+    if #vim.lsp.get_clients({ bufnr = vim.api.nvim_get_current_buf() }) > 0 then
+      require('fzf-lua').lsp_definitions({ jump_to_single_result = true })
+    else
+      vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes('<C-]>', true, false, true), 'n', false)
+    end
   end
 end
 

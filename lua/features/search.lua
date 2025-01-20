@@ -5,20 +5,14 @@ local plugins = {}
 
 vim.keymap.set('n', '<esc>', ':nohlsearch<CR>', { noremap = true, silent = true, desc = 'Reset search highlight' })
 
-if env.is_vscode then
-  vim.keymap.set(
-    'n',
-    '<leader>fs',
-    vscode.action('workbench.action.findInFiles'),
-    { noremap = true, silent = true, desc = 'Find in files' }
-  )
-else
-  vim.keymap.set(
-    'n',
-    '<leader>fs',
-    '<cmd>FzfLua live_grep<cr>',
-    { noremap = true, silent = true, desc = 'Find in files' }
-  )
+local function file_search()
+  if env.is_vscode then
+    vscode.action('workbench.action.findInFiles')()
+  else
+    require('fzf-lua').live_grep()
+  end
 end
+
+vim.keymap.set('n', '<leader>fs', file_search, { silent = true, desc = 'Find in files' })
 
 return plugins

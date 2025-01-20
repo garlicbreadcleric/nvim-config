@@ -23,26 +23,40 @@ pkg.add(plugins, {
   opts = {},
 })
 
-pkg.add(plugins, {
-  'nvim-lualine/lualine.nvim',
-  dependencies = { 'nvim-tree/nvim-web-devicons' },
-  opts = function()
-    local auto = require('lualine.themes.auto')
-    local solarized_light = require('lualine.themes.solarized_light')
-    auto.normal.b.fg = solarized_light.normal.c.fg
-    auto.normal.b.bg = solarized_light.normal.c.bg
-    return {
-      options = {
-        theme = auto,
-        component_separators = '',
-        section_separators = '',
-      },
-    }
-  end,
-  config = function(_, opts)
-    require('lualine').setup(opts)
-  end,
-})
+-- pkg.add(plugins, {
+--   'nvim-lualine/lualine.nvim',
+--   cond = not env.is_vscode,
+--   dependencies = { 'nvim-tree/nvim-web-devicons' },
+--   opts = function()
+--     local auto = require('lualine.themes.auto')
+--     local solarized_light = require('lualine.themes.solarized_light')
+--     auto.normal.b.fg = solarized_light.normal.c.fg
+--     auto.normal.b.bg = solarized_light.normal.c.bg
+--     return {
+--       options = {
+--         theme = auto,
+--         component_separators = '',
+--         section_separators = '',
+--       },
+--     }
+--   end,
+--   config = function(_, opts)
+--     require('lualine').setup(opts)
+--   end,
+-- })
+
+-- pkg.add(plugins, {
+--   'folke/zen-mode.nvim',
+--   opts = {
+--     window = {
+--       backdrop = 1,
+--       width = 100,
+--     },
+--   },
+--   keys = {
+--     { '<leader>wz', '<cmd>ZenMode<cr>', desc = 'Zen mode' },
+--   },
+-- })
 
 if env.is_vanilla then
   vim.api.nvim_create_autocmd('FileType', {
@@ -54,6 +68,10 @@ if env.is_vanilla then
         vim.opt_local.breakindent = true
         vim.opt_local.number = false
         vim.opt_local.signcolumn = 'no'
+        vim.opt_local.textwidth = 80
+
+        vim.api.nvim_buf_del_keymap(0, 'n', '[[')
+        vim.api.nvim_buf_del_keymap(0, 'n', ']]')
       end
     end,
     group = vim.api.nvim_create_augroup('MarkdownSettings', { clear = true }),
