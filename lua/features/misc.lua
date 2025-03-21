@@ -1,5 +1,6 @@
 local pkg = require('lib.pkg')
 local env = require('lib.env')
+local pick = require('lib.pick')
 
 local plugins = {}
 
@@ -26,7 +27,7 @@ pkg.add(plugins, {
       },
     })
 
-    if env.is_vanilla then
+    if not env.is_vscode then
       require('mini.pairs').setup({})
 
       local function mini_files_reveal()
@@ -65,10 +66,27 @@ pkg.add(plugins, {
     notifier = { enabled = not env.is_vscode },
     rename = { enabled = not env.is_vscode },
     lazygit = { enabled = not env.is_vscode },
+    picker = {
+      layout = { layout = { backdrop = false } },
+      win = {
+        input = {
+          keys = {
+            ['<esc>'] = { 'close', mode = { 'i', 'n' } },
+          },
+        },
+      },
+      confirm = pick.confirm,
+    },
+    zen = {
+      toggles = { dim = false },
+      win = { style = { style = {
+        backdrop = { blend = 0, bg = '#ffffff' },
+      } } },
+    },
   },
   config = function(_, opts)
     require('snacks').setup(opts)
-    if env.is_vanilla then
+    if not env.is_vscode then
       vim.api.nvim_create_autocmd('User', {
         pattern = 'MiniFilesActionRename',
         callback = function(event)
@@ -85,13 +103,13 @@ pkg.add(plugins, {
       end,
       desc = 'Lazygit',
     },
-    -- {
-    --   '<leader>z',
-    --   function()
-    --     require('snacks').zen()
-    --   end,
-    --   desc = 'Lazygit',
-    -- },
+    {
+      '<leader>wz',
+      function()
+        require('snacks').zen()
+      end,
+      desc = 'Zen Mode',
+    },
   },
 })
 

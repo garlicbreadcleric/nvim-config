@@ -31,7 +31,7 @@ else
   vim.opt.foldtext = 'v:lua.CustomFoldText()'
   vim.opt.fillchars = { fold = ' ' }
   vim.opt.foldmethod = 'expr'
-  vim.opt.foldexpr = 'nvim_treesitter#foldexpr()'
+  vim.opt.foldexpr = 'v:lua.vim.treesitter.foldexpr()'
 
   vim.opt.tabstop = 4
   vim.opt.shiftwidth = 4

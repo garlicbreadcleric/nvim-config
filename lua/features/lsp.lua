@@ -15,7 +15,11 @@ pkg.add(plugins, {
 pkg.add(plugins, {
   'pmizio/typescript-tools.nvim',
   dependencies = { 'nvim-lua/plenary.nvim', 'neovim/nvim-lspconfig' },
-  opts = {},
+  opts = {
+    settings = {
+      separate_diagnostic_server = false,
+    },
+  },
 })
 
 pkg.add(plugins, {
@@ -33,39 +37,43 @@ pkg.add(plugins, {
         -- JavaScript/Typescript.
         -- 'vtsls',
         'eslint_d',
+        -- 'eslint-lsp',
         'js-debug-adapter',
         'prettierd',
+        'ts_ls',
 
         -- Python.
         'pyright',
 
         -- Lua.
         'lua_ls',
+
+        -- Go.
+        'gopls',
       },
     })
     require('mason-lspconfig').setup()
 
-    -- require('lspconfig').vtsls.setup({
-    --   settings = {
-    --     ['typescript.format.enable'] = false,
-    --     ['javascript.format.enable'] = false,
-    --   },
-    -- })
     require('lspconfig').lua_ls.setup({})
     require('lspconfig').pyright.setup({})
+    require('lspconfig').gopls.setup({})
   end,
 })
 
-pkg.add(plugins, {
-  'ray-x/lsp_signature.nvim',
-  cond = not env.is_vscode,
-  opts = {
-    hint_prefix = '',
-  },
-  config = function(_, opts)
-    require('lsp_signature').setup(opts)
-  end,
-})
+-- pkg.add(plugins, {
+--   'ray-x/lsp_signature.nvim',
+--   version = '0.*',
+--   cond = not env.is_vscode,
+--   opts = {
+--     floating_window = true,
+--     floating_window_above_cur_line = true,
+--     hint_enable = false,
+--     hint_prefix = '',
+--   },
+--   config = function(_, opts)
+--     require('lsp_signature').setup(opts)
+--   end,
+-- })
 
 pkg.add(plugins, {
   'hedyhli/outline.nvim',
@@ -82,6 +90,10 @@ pkg.add(plugins, {
   'j-hui/fidget.nvim',
   cond = not env.is_vscode,
   opts = {},
+})
+
+pkg.add(plugins, {
+  'Bekaboo/dropbar.nvim',
 })
 
 local function show_hover()
@@ -130,7 +142,7 @@ local function lsp_definitions()
     vim.lsp.buf.definition()
   else
     if #vim.lsp.get_clients({ bufnr = vim.api.nvim_get_current_buf() }) > 0 then
-      require('fzf-lua').lsp_definitions({ jump_to_single_result = true })
+      Snacks.picker.lsp_definitions()
     else
       vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes('<C-]>', true, false, true), 'n', false)
     end
@@ -141,7 +153,7 @@ local function lsp_references()
   if env.is_vscode then
     vim.lsp.buf.references()
   else
-    require('fzf-lua').lsp_references({ jump_to_single_result = true })
+    Snacks.picker.lsp_references()
   end
 end
 
@@ -149,7 +161,7 @@ local function lsp_implementations()
   if env.is_vscode then
     vim.lsp.buf.implementation()
   else
-    require('fzf-lua').lsp_implementations({ jump_to_single_result = true })
+    Snacks.picker.lsp_implementations()
   end
 end
 
@@ -157,7 +169,7 @@ local function lsp_type_definitions()
   if env.is_vscode then
     vim.lsp.buf.type_definition()
   else
-    require('fzf-lua').lsp_type_definitions({ jump_to_single_result = true })
+    Snacks.picker.lsp_type_definitions()
   end
 end
 
@@ -165,7 +177,7 @@ local function lsp_document_symbols()
   if env.is_vscode then
     vim.lsp.buf.document_symbol()
   else
-    require('fzf-lua').lsp_document_symbols({ jump_to_single_result = true })
+    Snacks.picker.lsp_symbols()
   end
 end
 
@@ -173,7 +185,7 @@ local function lsp_workspace_symbols()
   if env.is_vscode then
     vim.lsp.buf.workspace_symbol()
   else
-    require('fzf-lua').lsp_workspace_symbols({ jump_to_single_result = true })
+    Snacks.picker.lsp_workspace_symbols()
   end
 end
 
@@ -186,7 +198,7 @@ vim.keymap.set('n', '<leader>cS', lsp_workspace_symbols, { noremap = true, silen
 
 if not env.is_vscode then
   vim.keymap.set('n', '<leader>cd', function()
-    require('fzf-lua').diagnostics_document({ jump_to_single_result = true })
+    Snacks.picker.diagnostics_buffer()
   end, { noremap = true, silent = true, desc = 'Find diagnostic' })
   vim.keymap.set('n', '<leader>ch', show_hover, { silent = true, desc = 'Hover' })
 end

@@ -40,9 +40,6 @@ pkg.add(plugins, {
   end,
   main = 'diffview',
   setup = true,
-  -- setup = function(_, opts)
-  --   require('diffview').setup(opts)
-  -- end,
 })
 
 pkg.add(plugins, {
@@ -85,36 +82,18 @@ pkg.add(plugins, {
   },
 })
 
--- pkg.add(plugins, {
---   'NeogitOrg/neogit',
---   cond = env.is_vanilla,
---   dependencies = {
---     'nvim-lua/plenary.nvim',
---     'sindrets/diffview.nvim',
---     'ibhagwan/fzf-lua',
---   },
---   opts = {
---     kind = 'floating',
---   },
---   config = true,
---   keys = {
---     { '<leader>gs', '<cmd>Neogit<cr>', desc = 'Git status' },
---   },
--- })
+pkg.add(plugins, { 'akinsho/git-conflict.nvim', version = '*', config = true })
 
-if env.is_vanilla then
-  vim.keymap.set(
-    'n',
-    '<leader>gc',
-    '<cmd>FzfLua git_bcommits<cr>',
-    { noremap = true, silent = true, desc = 'Find Git commit' }
-  )
-  vim.keymap.set(
-    'n',
-    '<leader>gb',
-    '<cmd>FzfLua git_branches<cr>',
-    { noremap = true, silent = true, desc = 'Find Git branch' }
-  )
+if not env.is_vscode then
+  vim.keymap.set('n', '<leader>gl', function()
+    Snacks.picker.git_log()
+  end, { noremap = true, silent = true, desc = 'Git log' })
+  vim.keymap.set('n', '<leader>gb', function()
+    Snacks.picker.git_branches()
+  end, { noremap = true, silent = true, desc = 'Find Git branch' })
+  vim.keymap.set('n', '<leader>gs', function()
+    Snacks.picker.git_status()
+  end)
 end
 
 return plugins

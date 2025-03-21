@@ -1,0 +1,22 @@
+{
+  "function": {
+    "prefix": "fn",
+    "body": ["function ${1}(${2}): ${3:any} {", "\t${0}", "}"]
+  },
+  "async function": {
+    "prefix": "afn",
+    "body": ["async function ${1}(${2}): Promise<${3:any}> {", "\t${0}", "}"]
+  },
+  "for": {
+    "prefix": "fori",
+    "body": ["for (let ${1} = 0; ${1} < ${2}; ${1}++) {", "\t${0}", "}"]
+  },
+  "for of": {
+    "prefix": "forof",
+    "body": ["for (const ${1} of ${2}) {", "\t${0}", "}"]
+  },
+  "for await of": {
+    "prefix": "aforof",
+    "body": ["for await (const ${1} of ${2}) {", "\t${0}", "}"]
+  }
+}

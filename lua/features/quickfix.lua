@@ -25,9 +25,9 @@ pkg.add(plugins, {
   config = true,
 })
 
-if env.is_vanilla then
+if not env.is_vscode then
   vim.keymap.set('n', '<leader>qf', function()
-    require('fzf-lua').quickfix()
+    Snacks.picker.qflist()
   end, { noremap = true, silent = true, desc = 'QuickFix list' })
 
   vim.keymap.set('n', '<leader>qt', function()

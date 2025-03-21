@@ -12,6 +12,14 @@ pkg.add(plugins, {
   end,
 })
 
+pkg.add(plugins, {
+  'jake-stewart/multicursor.nvim',
+  branch = '1.0',
+  config = function()
+    local mc = require('multicursor-nvim')
+  end,
+})
+
 vim.keymap.set({ 'n', 'v' }, 'j', 'gj', { noremap = true, silent = true })
 vim.keymap.set({ 'n', 'v' }, 'k', 'gk', { noremap = true, silent = true })
 
@@ -125,7 +133,7 @@ vim.keymap.set('n', 'U', '<C-r>', { noremap = true, silent = true })
 vim.keymap.set('n', 'M', 'J', { noremap = true, silent = true, desc = 'Merge lines' })
 vim.keymap.set('v', 'M', 'J', { noremap = true, silent = true, desc = 'Merge lines' })
 
-if env.is_vanilla then
+if not env.is_vscode then
   vim.keymap.set('v', '<C-c>', '"+y', { noremap = true, silent = true })
   vim.keymap.set('i', '<C-v>', '<C-r>+', { noremap = true, silent = true })
 

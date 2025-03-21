@@ -2,7 +2,7 @@ local env = require('lib.env')
 
 local plugins = {}
 
-if env.is_vanilla then
+if not env.is_vscode then
   vim.keymap.set('n', '<leader>tn', '<cmd>tabnew<cr>', { noremap = true, silent = true, desc = 'Delete tab' })
   vim.keymap.set('n', '<leader>td', '<cmd>tabclose<cr>', { noremap = true, silent = true, desc = 'Delete tab' })
   vim.keymap.set('n', '<leader>t1', '1gt', { noremap = true, silent = true, desc = 'Go to tab 1' })

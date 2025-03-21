@@ -1,8 +1,10 @@
+local env = require('lib.env')
+
 return {
   {
     'folke/which-key.nvim',
     event = 'VeryLazy',
-    cond = is_vanilla,
+    cond = not env.is_vscode,
     opts = {},
     keys = {
       {

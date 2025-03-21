@@ -9,7 +9,7 @@ local function file_search()
   if env.is_vscode then
     vscode.action('workbench.action.findInFiles')()
   else
-    require('fzf-lua').live_grep()
+    Snacks.picker.grep()
   end
 end
 

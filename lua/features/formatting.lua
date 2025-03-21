@@ -13,6 +13,8 @@ return {
         yaml = { 'prettierd' },
         lua = { 'stylua' },
         fish = { 'fish_indent' },
+        go = { 'gofmt' },
+        markdown = { 'prettierd' },
       },
     },
     keys = {
@@ -20,6 +22,7 @@ return {
         '<leader>cf',
         function()
           require('conform').format()
+          -- require('lint').try_lint()
         end,
         desc = 'Format code',
       },

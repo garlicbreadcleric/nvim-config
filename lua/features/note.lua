@@ -8,7 +8,7 @@ pkg.add(plugins, {
   cond = not env.is_windows,
   lazy = false,
   opts = {
-    picker = 'fzf_lua',
+    picker = 'snacks_picker',
   },
   config = function(_, opts)
     require('zk').setup(opts)
@@ -17,7 +17,7 @@ pkg.add(plugins, {
 
 pkg.add(plugins, {
   'MeanderingProgrammer/render-markdown.nvim',
-  cond = env.is_vanilla,
+  cond = not env.is_vscode,
   dependencies = { 'nvim-treesitter/nvim-treesitter', 'echasnovski/mini.nvim' },
   opts = {},
 })

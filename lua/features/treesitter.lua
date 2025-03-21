@@ -19,9 +19,10 @@ return {
     lazy = false,
     opts = {
       fold = { enable = true },
-      highlights = { enable = env.is_vanilla },
+      highlights = { enable = not env.is_vscode },
       indent = { enable = true },
       ensure_installed = {
+        'go',
         'javascript',
         'json',
         'lua',

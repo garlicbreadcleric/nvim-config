@@ -2,7 +2,7 @@ local env = require('lib.env')
 
 local plugins = {}
 
-if env.is_vanilla then
+if not env.is_vscode then
   function CustomFoldText()
     local line = vim.fn.getline(vim.v.foldstart)
     local lines_count = vim.v.foldend - vim.v.foldstart + 1

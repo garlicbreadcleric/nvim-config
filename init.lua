@@ -40,11 +40,10 @@ if env.is_vscode then
     { noremap = true, silent = true, desc = 'Command palette' }
   )
 else
-  vim.keymap.set(
-    'n',
-    '<leader><leader>',
-    '<cmd>FzfLua commands<cr>',
-    { noremap = true, silent = true, desc = 'Command palette' }
-  )
-  vim.keymap.set('n', '<leader>h', '<cmd>FzfLua helptags<cr>', { noremap = true, silent = true, desc = 'Help' })
+  vim.keymap.set('n', '<leader><leader>', function()
+    Snacks.picker.commands()
+  end, { noremap = true, silent = true, desc = 'Command palette' })
+  vim.keymap.set('n', '<leader>h', function()
+    Snacks.picker.help()
+  end, { noremap = true, silent = true, desc = 'Help' })
 end

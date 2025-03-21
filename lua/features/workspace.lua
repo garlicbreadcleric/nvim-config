@@ -13,45 +13,9 @@ return {
     },
   },
 
-  -- WARN: With quicker.nvim, leaving quickfix window open before closing Neovim
-  -- caused it to freeze on restart when session was restored by resession.nvim.
-
-  -- {
-  --   'stevearc/resession.nvim',
-  --   cond = env.is_vanilla and not env.disable_resession,
-  --   lazy = false,
-  --   opts = {
-  --     autosave = {
-  --       enabled = true,
-  --       interval = 60,
-  --       notify = true,
-  --     },
-  --   },
-  --   config = function(_, opts)
-  --     local resession = require('resession')
-  --     resession.setup(opts)
-  --     vim.api.nvim_create_autocmd('VimEnter', {
-  --       callback = function()
-  --         if env.disable_resession or vim.fn.argc(-1) > 0 then
-  --           return
-  --         end
-  --         resession.load(vim.fn.getcwd(), { dir = 'dirsession', silence_errors = true })
-  --       end,
-  --       nested = true,
-  --     })
-  --     vim.api.nvim_create_autocmd('VimLeavePre', {
-  --       callback = function()
-  --         if env.disable_resession then
-  --           return
-  --         end
-  --         resession.save(vim.fn.getcwd(), { dir = 'dirsession', notify = false })
-  --       end,
-  --     })
-  --   end,
-  -- },
   {
     'stevearc/stickybuf.nvim',
-    cond = env.is_vanilla,
+    cond = not env.is_vscode,
     lazy = false,
     keys = {
       { '<leader>wp', '<cmd>PinBuffer<cr>', { noremap = true, silent = true, desc = 'Pin buffer to window' } },

@@ -11,54 +11,65 @@ pkg.add(plugins, {
   ---@type solarized.config
   opts = {},
   config = function(_, opts)
-    require('solarized').setup(opts)
-    vim.cmd.colorscheme('solarized')
-    -- vim.cmd('hi Normal guibg=NONE ctermbg=NONE')
+    -- require('solarized').setup(opts)
+    -- vim.cmd.colorscheme('solarized')
   end,
 })
 
 pkg.add(plugins, {
-  'stevearc/dressing.nvim',
+  'rose-pine/neovim',
   lazy = false,
-  opts = {},
+  cond = not env.is_vscode,
+  priority = 1000,
+  name = 'rose-pine',
+  config = function()
+    -- vim.cmd('colorscheme rose-pine-dawn')
+  end,
+})
+
+pkg.add(plugins, {
+  'projekt0n/github-nvim-theme',
+  name = 'github-theme',
+  lazy = false,
+  priority = 1001,
+  config = function(_, opts)
+    require('github-theme').setup(opts)
+    vim.cmd('colorscheme github_light')
+  end,
+})
+
+pkg.add(plugins, {
+  'EdenEast/nightfox.nvim',
+  lazy = false,
+  priority = 1000,
+  config = function(_, opts)
+    -- vim.cmd('colorscheme nightfox')
+  end,
 })
 
 -- pkg.add(plugins, {
---   'nvim-lualine/lualine.nvim',
---   cond = not env.is_vscode,
---   dependencies = { 'nvim-tree/nvim-web-devicons' },
---   opts = function()
---     local auto = require('lualine.themes.auto')
---     local solarized_light = require('lualine.themes.solarized_light')
---     auto.normal.b.fg = solarized_light.normal.c.fg
---     auto.normal.b.bg = solarized_light.normal.c.bg
---     return {
---       options = {
---         theme = auto,
---         component_separators = '',
---         section_separators = '',
---       },
---     }
---   end,
---   config = function(_, opts)
---     require('lualine').setup(opts)
---   end,
+--   'stevearc/dressing.nvim',
+--   lazy = false,
+--   opts = {},
 -- })
 
--- pkg.add(plugins, {
---   'folke/zen-mode.nvim',
---   opts = {
---     window = {
---       backdrop = 1,
---       width = 100,
---     },
---   },
---   keys = {
---     { '<leader>wz', '<cmd>ZenMode<cr>', desc = 'Zen mode' },
---   },
--- })
+pkg.add(plugins, {
+  'folke/noice.nvim',
+  event = 'VeryLazy',
+  opts = {
+    -- add any options here
+  },
+  dependencies = {
+    -- if you lazy-load any plugin below, make sure to add proper `module="..."` entries
+    'MunifTanjim/nui.nvim',
+    -- OPTIONAL:
+    --   `nvim-notify` is only needed, if you want to use the notification view.
+    --   If not available, we use `mini` as the fallback
+    'rcarriga/nvim-notify',
+  },
+})
 
-if env.is_vanilla then
+if not env.is_vscode then
   vim.api.nvim_create_autocmd('FileType', {
     pattern = '*',
     callback = function()
@@ -76,6 +87,15 @@ if env.is_vanilla then
     end,
     group = vim.api.nvim_create_augroup('MarkdownSettings', { clear = true }),
   })
+end
+
+if env.is_neovide then
+  vim.o.guifont = 'JetBrainsMonoNL Nerd Font:h10'
+  vim.g.neovide_padding_top = 10
+  vim.g.neovide_padding_bottom = 10
+  vim.g.neovide_padding_right = 10
+  vim.g.neovide_padding_left = 10
+  vim.g.neovide_floating_shadow = false
 end
 
 return plugins
