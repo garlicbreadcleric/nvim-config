@@ -8,7 +8,7 @@ local function get_env(name, default)
   env_var = env_var:lower()
   env_var = env_var:match('^%s*(.-)%s*$')
   return env_var == '1' or env_var == 'true'
-end
+end --
 
 env.is_vscode = not not vim.g.vscode
 env.is_neovide = vim.g.neovide

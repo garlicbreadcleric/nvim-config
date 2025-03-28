@@ -7,10 +7,10 @@ return {
   {
     'aaronik/treewalker.nvim',
     keys = {
-      { '<c-s-h>', '<cmd>Treewalker Left<cr>', { modes = { 'n', 'v' }, silent = true, desc = 'Treewalker left' } },
-      { '<c-s-j>', '<cmd>Treewalker Down<cr>', { modes = { 'n', 'v' }, silent = true, desc = 'Treewalker down' } },
-      { '<c-s-k>', '<cmd>Treewalker Up<cr>', { modes = { 'n', 'v' }, silent = true, desc = 'Treewalker up' } },
-      { '<c-s-l>', '<cmd>Treewalker Right<cr>', { modes = { 'n', 'v' }, silent = true, desc = 'Treewalker right' } },
+      { '<c-s-h>', '<cmd>Treewalker Left<cr>', mode = { 'n', 'v' }, silent = true, desc = 'Treewalker left' },
+      { '<c-s-j>', '<cmd>Treewalker Down<cr>', mode = { 'n', 'v' }, silent = true, desc = 'Treewalker down' },
+      { '<c-s-k>', '<cmd>Treewalker Up<cr>', mode = { 'n', 'v' }, silent = true, desc = 'Treewalker up' },
+      { '<c-s-l>', '<cmd>Treewalker Right<cr>', mode = { 'n', 'v' }, silent = true, desc = 'Treewalker right' },
     },
   },
   {
@@ -27,6 +27,7 @@ return {
         'json',
         'lua',
         'markdown',
+        'markdown_inline',
         'python',
         'tsx',
         'typescript',

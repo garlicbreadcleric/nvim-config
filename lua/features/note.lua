@@ -5,7 +5,7 @@ local plugins = {}
 
 pkg.add(plugins, {
   'zk-org/zk-nvim',
-  cond = not env.is_windows,
+  cond = not env.is_vscode and not env.is_windows,
   lazy = false,
   opts = {
     picker = 'snacks_picker',
@@ -22,24 +22,48 @@ pkg.add(plugins, {
   opts = {},
 })
 
--- pkg.add(plugins, {
---   'oflisback/obsidian-bridge.nvim',
---   opts = {
---     obsidian_server_address = 'http://localhost:27123',
---     scroll_sync = true,
---     cert_path = nil,
---   },
---   main = 'obsidian-bridge',
---   config = true,
---   event = {
---     'BufReadPre *.md',
---     'BufNewFile *.md',
---   },
---   lazy = true,
---   dependencies = {
---     'nvim-lua/plenary.nvim',
---     'nvim-telescope/telescope.nvim',
---   },
--- })
+pkg.add(plugins, {
+  'roodolv/markdown-toggle.nvim',
+  main = 'markdown-toggle',
+  config = true,
+  opts = {
+    enable_autolist = true,
+    box_table = { 'x' },
+  },
+  keys = {
+    {
+      '<cr>',
+      function()
+        require('markdown-toggle').autolist_cr()
+      end,
+      mode = { 'i' },
+      ft = 'markdown',
+    },
+    {
+      'o',
+      function()
+        require('markdown-toggle').autolist_down()
+      end,
+      mode = { 'n' },
+      ft = 'markdown',
+    },
+    {
+      'O',
+      function()
+        require('markdown-toggle').autolist_up()
+      end,
+      mode = { 'n' },
+      ft = 'markdown',
+    },
+    {
+      '<c-cr>',
+      function()
+        require('markdown-toggle').checkbox_cycle()
+      end,
+      mode = { 'n', 'v' },
+      ft = 'markdown',
+    },
+  },
+})
 
 return plugins

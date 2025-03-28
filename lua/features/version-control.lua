@@ -11,7 +11,7 @@ pkg.add(plugins, {
     { '<leader>gd', '<cmd>DiffviewOpen<cr>', desc = 'Git diff' },
     { '<leader>gh', '<cmd>DiffviewFileHistory %<cr>', desc = 'Git history (current file)' },
     { '<leader>gH', '<cmd>DiffviewFileHistory<cr>', desc = 'Git history' },
-  },
+  }, --
   opts = function()
     local actions = require('diffview.actions')
     return {

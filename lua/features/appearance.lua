@@ -96,6 +96,7 @@ if env.is_neovide then
   vim.g.neovide_padding_right = 10
   vim.g.neovide_padding_left = 10
   vim.g.neovide_floating_shadow = false
+  vim.g.neovide_cursor_animate_in_insert_mode = false
 end
 
 return plugins

@@ -19,7 +19,7 @@ blink_cmdline_keymap['<c-j>'] = { 'show', 'select_next', 'fallback' }
 return {
   {
     'Saghen/blink.cmp',
-    version = 'v0.*',
+    version = 'v1.*',
     build = 'cargo build --release',
     cond = not env.is_vscode,
     lazy = false,
