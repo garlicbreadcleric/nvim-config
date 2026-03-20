@@ -23,13 +23,14 @@ return {
     build = 'cargo build --release',
     cond = not env.is_vscode,
     lazy = false,
-    dependencies = { 'L3MON4D3/LuaSnip' },
+    dependencies = { 'L3MON4D3/LuaSnip', version = 'v2.*' },
     opts = {
       keymap = blink_keymap,
       cmdline = {
         keymap = blink_cmdline_keymap,
         completion = { menu = { auto_show = true } },
       },
+      snippets = { preset = 'luasnip' },
       sources = {
         default = { 'snippets', 'lsp', 'path', 'buffer', 'lazydev' },
         providers = {

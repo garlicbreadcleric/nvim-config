@@ -126,8 +126,14 @@ local function word_start_end()
   object_start_end('iw')
 end
 
+local function WORD_start_end()
+  object_start_end('iW')
+end
+
 vim.keymap.set('n', 'w', word_start_end, { noremap = true, desc = 'Toggle between start/end of word' })
 vim.keymap.set('v', 'w', word_start_end, { noremap = true, desc = 'Toggle between start/end of word' })
+vim.keymap.set('n', 'W', WORD_start_end, { noremap = true, desc = 'Toggle between start/end of word' })
+vim.keymap.set('v', 'W', WORD_start_end, { noremap = true, desc = 'Toggle between start/end of word' })
 
 vim.keymap.set('n', 'U', '<C-r>', { noremap = true, silent = true })
 vim.keymap.set('n', 'M', 'J', { noremap = true, silent = true, desc = 'Merge lines' })

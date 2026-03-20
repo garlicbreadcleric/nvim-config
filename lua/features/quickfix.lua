@@ -3,9 +3,6 @@ local pkg = require('lib.pkg')
 
 local plugins = {}
 
--- WARN: With quicker.nvim, leaving quickfix window open before closing Neovim
--- caused it to freeze on restart when session was restored by resession.nvim.
-
 pkg.add(plugins, {
   'stevearc/quicker.nvim',
   event = 'FileType qf',

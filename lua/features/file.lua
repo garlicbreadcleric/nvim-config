@@ -4,17 +4,42 @@ local vscode = require('lib.vscode')
 
 local plugins = {}
 
+-- pkg.add(plugins, {
+--   'nvim-neo-tree/neo-tree.nvim',
+--   cond = not env.is_vscode,
+--   branch = 'v3.x',
+--   dependencies = {
+--     'nvim-lua/plenary.nvim',
+--     'nvim-tree/nvim-web-devicons',
+--     'MunifTanjim/nui.nvim',
+--   },
+--   keys = {
+--     { '<leader>ft', '<cmd>Neotree toggle<cr>', desc = 'Toggle file tree' },
+--   },
+-- })
+
 pkg.add(plugins, {
-  'nvim-neo-tree/neo-tree.nvim',
+  'nvim-tree/nvim-tree.lua',
   cond = not env.is_vscode,
-  branch = 'v3.x',
-  dependencies = {
-    'nvim-lua/plenary.nvim',
-    'nvim-tree/nvim-web-devicons',
-    'MunifTanjim/nui.nvim',
+  opts = {
+    on_attach = function(bufnr)
+      local api = require('nvim-tree.api')
+
+      vim.keymap.set('n', '<tab>', api.node.open.preview, { buffer = bufnr })
+      vim.keymap.set('n', '<cr>', api.node.open.edit, { buffer = bufnr })
+      vim.keymap.set('n', 'h', api.node.navigate.parent_close, { buffer = bufnr })
+      vim.keymap.set('n', 'l', api.node.open.preview, { buffer = bufnr })
+      vim.keymap.set('n', 'H', api.tree.change_root_to_parent, { buffer = bufnr })
+      vim.keymap.set('n', 'L', api.tree.change_root_to_node, { buffer = bufnr })
+      vim.keymap.set('n', 'r', api.fs.rename, { buffer = bufnr })
+      vim.keymap.set('n', 'd', api.fs.remove, { buffer = bufnr })
+      vim.keymap.set('n', 'D', api.fs.trash, { buffer = bufnr })
+    end,
   },
+  main = 'nvim-tree',
+  config = true,
   keys = {
-    { '<leader>ft', '<cmd>Neotree toggle<cr>', desc = 'Toggle file tree' },
+    { '<leader>ft', '<cmd>NvimTreeToggle<cr>', desc = 'Toggle file tree' },
   },
 })
 

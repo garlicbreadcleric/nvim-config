@@ -50,6 +50,12 @@ pkg.add(plugins, {
 
         -- Go.
         'gopls',
+
+        -- Dotnet.
+        'csharp_ls',
+
+        -- Markdown.
+        'marksman',
       },
     })
     require('mason-lspconfig').setup()
@@ -57,6 +63,8 @@ pkg.add(plugins, {
     require('lspconfig').lua_ls.setup({})
     require('lspconfig').pyright.setup({})
     require('lspconfig').gopls.setup({})
+    require('lspconfig').csharp_ls.setup({})
+    require('lspconfig').marksman.setup({})
   end,
 })
 

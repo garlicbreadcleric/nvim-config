@@ -24,7 +24,7 @@ require('lazy').setup({
   spec = {
     { import = 'features' },
   },
-  install = { colorscheme = { 'solarized' } },
+  install = { colorscheme = { 'github_light' } },
   checker = { enabled = true },
   rocks = { hererocks = true },
 })

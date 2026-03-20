@@ -29,6 +29,7 @@ pkg.add(plugins, {
 
     if not env.is_vscode then
       require('mini.pairs').setup({})
+      require('mini.statusline').setup({})
 
       local function mini_files_reveal()
         local path = vim.bo.buftype ~= 'nofile' and vim.api.nvim_buf_get_name(0) or nil
@@ -57,8 +58,10 @@ pkg.add(plugins, {
     end
   end,
 })
+
 pkg.add(plugins, {
   'folke/snacks.nvim',
+  commit = 'f6c8e80dd724453a6d06e0af08dd4bb06f5505c0',
   priority = 1000,
   lazy = false,
   opts = {
@@ -110,6 +113,13 @@ pkg.add(plugins, {
       end,
       desc = 'Zen Mode',
     },
+    -- {
+    --   '<leader>ft',
+    --   function()
+    --     require('snacks').explorer()
+    --   end,
+    --   desc = 'Toggle file tree',
+    -- },
   },
 })
 

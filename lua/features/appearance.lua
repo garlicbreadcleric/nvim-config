@@ -4,6 +4,51 @@ local env = require('lib.env')
 local plugins = {}
 
 pkg.add(plugins, {
+  'scottmckendry/cyberdream.nvim',
+  lazy = false,
+  cond = not env.is_vscode,
+  priority = 1000,
+  config = function()
+    -- vim.cmd.colorscheme('cyberdream')
+  end,
+})
+
+pkg.add(plugins, {
+  'rebelot/kanagawa.nvim',
+  lazy = false,
+  cond = not env.is_vscode,
+  priority = 1000,
+  config = function(_, opts)
+    -- vim.cmd.colorscheme('kanagawa')
+  end,
+})
+
+pkg.add(plugins, {
+  'neanias/everforest-nvim',
+  lazy = false,
+  cond = not env.is_vscode,
+  priority = 1000,
+  opts = {
+    background = 'hard',
+  },
+  config = function(_, opts)
+    -- require('everforest').setup(opts)
+    -- vim.cmd('colorscheme everforest')
+  end,
+})
+
+pkg.add(plugins, {
+  'ellisonleao/gruvbox.nvim',
+  lazy = false,
+  cond = not env.is_vscode,
+  priority = 1000,
+  config = function(_, opts)
+    -- vim.o.background = 'light'
+    -- vim.cmd('colorscheme gruvbox')
+  end,
+})
+
+pkg.add(plugins, {
   'maxmx03/solarized.nvim',
   lazy = false,
   cond = not env.is_vscode,
@@ -31,7 +76,7 @@ pkg.add(plugins, {
   'projekt0n/github-nvim-theme',
   name = 'github-theme',
   lazy = false,
-  priority = 1001,
+  priority = 1000,
   config = function(_, opts)
     require('github-theme').setup(opts)
     vim.cmd('colorscheme github_light')
@@ -47,47 +92,15 @@ pkg.add(plugins, {
   end,
 })
 
--- pkg.add(plugins, {
---   'stevearc/dressing.nvim',
---   lazy = false,
---   opts = {},
--- })
-
 pkg.add(plugins, {
   'folke/noice.nvim',
   event = 'VeryLazy',
-  opts = {
-    -- add any options here
-  },
+  opts = {},
   dependencies = {
-    -- if you lazy-load any plugin below, make sure to add proper `module="..."` entries
     'MunifTanjim/nui.nvim',
-    -- OPTIONAL:
-    --   `nvim-notify` is only needed, if you want to use the notification view.
-    --   If not available, we use `mini` as the fallback
     'rcarriga/nvim-notify',
   },
 })
-
-if not env.is_vscode then
-  vim.api.nvim_create_autocmd('FileType', {
-    pattern = '*',
-    callback = function()
-      if vim.bo.filetype == 'markdown' and vim.bo.buftype ~= 'nofile' then
-        vim.opt_local.wrap = true
-        vim.opt_local.linebreak = true
-        vim.opt_local.breakindent = true
-        vim.opt_local.number = false
-        vim.opt_local.signcolumn = 'no'
-        vim.opt_local.textwidth = 80
-
-        vim.api.nvim_buf_del_keymap(0, 'n', '[[')
-        vim.api.nvim_buf_del_keymap(0, 'n', ']]')
-      end
-    end,
-    group = vim.api.nvim_create_augroup('MarkdownSettings', { clear = true }),
-  })
-end
 
 if env.is_neovide then
   vim.o.guifont = 'JetBrainsMonoNL Nerd Font:h10'

@@ -30,6 +30,7 @@ return {
       end,
     },
   },
+
   {
     'folke/edgy.nvim',
     event = 'VeryLazy',
@@ -43,9 +44,22 @@ return {
         },
       },
       left = {
+        -- {
+        --   title = 'Explorer',
+        --   ft = 'neo-tree',
+        --   size = { width = 0.2 },
+        -- },
         {
-          ft = 'neo-tree',
-          title = 'Files',
+          title = 'Explorer',
+          ft = 'NvimTree',
+          size = { width = 0.2 },
+        },
+        {
+          title = 'Explorer',
+          ft = 'snacks_layout_box',
+          filter = function(buf, win)
+            return vim.api.nvim_win_get_config(win).relative == ''
+          end,
           size = { width = 0.2 },
         },
         {
@@ -53,11 +67,21 @@ return {
           title = 'Outline',
           size = { width = 0.2 },
         },
-        {
-          ft = 'aerial',
-          title = 'Outline',
-          size = { width = 0.2 },
-        },
+      },
+    },
+  },
+
+  {
+    'folke/persistence.nvim',
+    event = 'BufReadPre',
+    opts = {},
+    keys = {
+      {
+        '<leader>sf',
+        function()
+          require('persistence').select()
+        end,
+        { noremap = true, silent = true, desc = 'Session find' },
       },
     },
   },

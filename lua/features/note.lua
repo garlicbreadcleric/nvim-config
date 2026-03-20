@@ -3,17 +3,17 @@ local env = require('lib.env')
 
 local plugins = {}
 
-pkg.add(plugins, {
-  'zk-org/zk-nvim',
-  cond = not env.is_vscode and not env.is_windows,
-  lazy = false,
-  opts = {
-    picker = 'snacks_picker',
-  },
-  config = function(_, opts)
-    require('zk').setup(opts)
-  end,
-})
+-- pkg.add(plugins, {
+--   'zk-org/zk-nvim',
+--   cond = not env.is_vscode and not env.is_windows,
+--   lazy = false,
+--   opts = {
+--     picker = 'snacks_picker',
+--   },
+--   config = function(_, opts)
+--     require('zk').setup(opts)
+--   end,
+-- })
 
 pkg.add(plugins, {
   'MeanderingProgrammer/render-markdown.nvim',
@@ -37,22 +37,6 @@ pkg.add(plugins, {
         require('markdown-toggle').autolist_cr()
       end,
       mode = { 'i' },
-      ft = 'markdown',
-    },
-    {
-      'o',
-      function()
-        require('markdown-toggle').autolist_down()
-      end,
-      mode = { 'n' },
-      ft = 'markdown',
-    },
-    {
-      'O',
-      function()
-        require('markdown-toggle').autolist_up()
-      end,
-      mode = { 'n' },
       ft = 'markdown',
     },
     {
